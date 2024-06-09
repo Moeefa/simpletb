@@ -1,0 +1,38 @@
+body {
+  margin: 0;
+  overflow: hidden;
+}
+
+.inverted-border-radius {
+  position: relative;
+  height: 0px;
+  width: 100%;
+  background-color: black;
+  border-radius: 0;
+}
+
+.inverted-border-radius::before {
+  content: "";
+  position: absolute;
+  left: 0;
+
+  background-color: transparent;
+  bottom: -20px;
+  height: 20px;
+  width: 10px;
+  border-top-left-radius: 10px;
+  box-shadow: 0 -10px 0 0 black;
+}
+
+.inverted-border-radius::after {
+  content: "";
+  position: absolute;
+  right: 0;
+
+  background-color: transparent;
+  bottom: -20px;
+  height: 20px;
+  width: 10px;
+  border-top-right-radius: 10px;
+  box-shadow: 0 -10px 0 0 black;
+}

@@ -1,0 +1,87 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    @apply overflow-hidden;
+  }
+
+  html,
+  body {
+    @apply h-full w-full bg-transparent;
+  }
+
+  body {
+    font-family: "Inter", "Segoe UI";
+    font-size: 70%;
+
+    /* Removing bottom border may cause the text not centering for some reason */
+    /* If removed, add a line-height property to center */
+    /* @apply select-none text-white border-b bg-gradient-to-b from-neutral-950/70 to-neutral-900/75 border-neutral-600/20; */
+  }
+
+  #root {
+    @apply h-full;
+  }
+}
+
+@keyframes bounce-up {
+  0%,
+  100% {
+    transform: none;
+    scale: 1;
+    animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+  }
+  15% {
+    scale: 0.75;
+    animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+  }
+  50% {
+    transform: translateY(-15%);
+    scale: 1;
+    animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+  }
+}
+
+@keyframes bounce-down {
+  0%,
+  100% {
+    transform: none;
+    scale: 1;
+    animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+  }
+  15% {
+    scale: 0.75;
+    animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+  }
+  50% {
+    transform: translateY(15%);
+    scale: 1;
+    animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+  }
+}
+
+.widget {
+  @apply flex items-center gap-2;
+}
+
+.main-container {
+  @apply flex justify-between px-4 h-full select-none text-white bg-black border-black;
+}
+
+.widgets {
+  @apply inline-flex items-center space-x-1;
+}
+
+.widgets.left {
+  @apply justify-start w-96;
+}
+
+.widgets.center {
+  @apply justify-center flex-1;
+}
+
+.widgets.right {
+  @apply justify-end w-96;
+}

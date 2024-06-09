@@ -1,0 +1,36 @@
+{
+  "name": "simpletb",
+  "private": true,
+  "version": "0.1.0-beta",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "tauri": "tauri"
+  },
+  "dependencies": {
+    "@fluentui/react-icons": "^2.0.240",
+    "@tauri-apps/api": ">=2.0.0-beta.0",
+    "@tauri-apps/plugin-http": "2.0.0-beta.2",
+    "@tauri-apps/plugin-process": "2.0.0-beta.2",
+    "@tauri-apps/plugin-shell": ">=2.0.0-beta.0",
+    "@types/node": "^20.12.7",
+    "buffer": "^6.0.3",
+    "framer-motion": "^10.17.0",
+    "icon-extractor": "^1.0.3",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": ">=2.0.0-beta.0",
+    "@types/react": "^18.2.15",
+    "@types/react-dom": "^18.2.7",
+    "@vitejs/plugin-react": "^4.2.1",
+    "autoprefixer": "^10.4.19",
+    "postcss": "^8.4.38",
+    "tailwindcss": "^3.4.3",
+    "typescript": "^5.0.2",
+    "vite": "^5.0.0"
+  }
+}
