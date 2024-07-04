@@ -38,6 +38,7 @@ export default function Label({ ...props }: HTMLAttributes<HTMLDivElement>) {
         src={replaceIcon(activeWindow)}
         alt={activeWindow.app}
         width="100%"
+        className="object-scale-down"
       />
     </div>
   );

@@ -2,7 +2,7 @@ use crate::ScreenGeometry;
 use tauri::Manager;
 use windows::Win32::{
   Foundation::HWND,
-  UI::WindowsAndMessaging::{GetCursorInfo, MoveWindow, CURSORINFO, CURSOR_SHOWING},
+  UI::WindowsAndMessaging::MoveWindow,
 };
 
 pub struct Hitbox {

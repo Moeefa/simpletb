@@ -12,8 +12,8 @@ use crate::utils::error_handler::Result;
 use crate::utils::icons_to_buff::get_icon;
 use crate::utils::Utils;
 
+use dock::MARGIN_BOTTOM;
 use lazy_static::lazy_static;
-use simple_home_dir::*;
 
 use tauri::window::{Effect, EffectsBuilder};
 use tauri::{Manager, WebviewWindow};
@@ -25,6 +25,7 @@ use std::path::PathBuf;
 use std::ptr::null_mut;
 use std::sync::{Arc, Mutex};
 use std::thread;
+use std::env;
 
 use active_win_pos_rs::{get_active_window, ActiveWindow};
 use ctrlc;
@@ -32,12 +33,12 @@ use regex::Regex;
 
 use windows::core::PCSTR;
 use windows::core::PSTR;
-use windows::Win32::Foundation::{CloseHandle, FALSE, HWND, RECT, TRUE};
+use windows::Win32::Foundation::{CloseHandle, FALSE, HWND, TRUE};
 use windows::Win32::System::Threading::{
   CreateProcessA, WaitForInputIdle, CREATE_NEW_CONSOLE, INFINITE, PROCESS_INFORMATION, STARTUPINFOA,
 };
 use windows::Win32::UI::WindowsAndMessaging::{
-  GetForegroundWindow, GetWindowPlacement, GetWindowRect, MoveWindow, SetForegroundWindow, SetMenu,
+  GetForegroundWindow, GetWindowPlacement, MoveWindow, SetForegroundWindow, SetMenu,
   SetWindowLongPtrA, ShowWindow, EVENT_MAX, EVENT_MIN, EVENT_OBJECT_FOCUS, EVENT_SYSTEM_FOREGROUND,
   GWL_EXSTYLE, SW_MINIMIZE, SW_RESTORE, WINDOWPLACEMENT, WINEVENT_OUTOFCONTEXT,
   WINEVENT_SKIPOWNPROCESS, WS_EX_TOOLWINDOW,
@@ -110,6 +111,7 @@ async fn open_settings(app: tauri::AppHandle) {
   }
 }
 
+#[allow(unused_variables)]
 #[tauri::command]
 async fn open_context(app: tauri::AppHandle, x: i32, y: i32) {
   // Create a settings window
@@ -140,8 +142,8 @@ async fn open_context(app: tauri::AppHandle, x: i32, y: i32) {
     thread::spawn(move || {
       MoveWindow(
         hwnd,
-        (screen.width / 2) - (220 / 2) + (x / 2),
-        screen.height / 2,
+        (screen.width / 2) - (220 / 2),
+        screen.height - 51 - MARGIN_BOTTOM - 120,
         220,
         120,
         true,
@@ -155,8 +157,8 @@ async fn open_context(app: tauri::AppHandle, x: i32, y: i32) {
 fn execute(commandline: String, mut applicationname: String) {
   unsafe {
     if applicationname.contains("%USERPROFILE%") {
-      let user_profile = home_dir().unwrap();
-      applicationname = applicationname.replace("%USERPROFILE%", user_profile.to_str().unwrap());
+      let user_profile = env::var("HOME").unwrap_or("".to_string());
+      applicationname = applicationname.replace("%USERPROFILE%", &user_profile);
       if !PathBuf::from(&applicationname).exists() {
         println!("File does not exist: {}", applicationname);
         return;
@@ -222,7 +224,7 @@ fn main() {
 
 // Function to load configuration from file
 fn load_configuration() -> Result<serde_json::Value, Box<dyn std::error::Error>> {
-  let file = fs::File::open("C:/Users/luizh/.simpletb/config.json")?;
+  let file = fs::File::open(format!("{}\\.simpletb\\config.json", env::var("HOME").unwrap_or("".to_string())))?;
   let config: serde_json::Value = serde_json::from_reader(file)?;
   Ok(config)
 }
@@ -256,7 +258,7 @@ fn setup_tauri_app(
 
     let window_clone = window.clone();
     let round_window_clone = round_window.clone();
-    app.listen("app-not-fullscreen", move |_msg| unsafe {
+    app.listen("app-not-fullscreen", move |_msg| {
       if !window_clone.is_visible().unwrap() {
         window_clone.show().unwrap();
         round_window_clone.show().unwrap();
@@ -371,7 +373,7 @@ fn create_round_window(
   // Create a round window
   // ...
   let window_height = config.get("height").and_then(|v| v.as_i64()).unwrap_or(32) as f64;
-  let (width, height) = unsafe { (ScreenGeometry::new().width, ScreenGeometry::new().height) };
+  let (width, _height) = unsafe { (ScreenGeometry::new().width, ScreenGeometry::new().height) };
 
   let webview_window = tauri::WebviewWindowBuilder::new(
     &app,

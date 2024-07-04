@@ -1,4 +1,4 @@
-use std::{ops::BitAnd, ptr, thread};
+use std::thread;
 
 use tauri::Manager;
 use windows::Win32::{
@@ -6,12 +6,9 @@ use windows::Win32::{
   UI::{
     Accessibility::{SetWinEventHook, HWINEVENTHOOK},
     WindowsAndMessaging::{
-      EnumWindows, GetParent, GetWindow, GetWindowInfo, GetWindowLongA, IsIconic, IsWindowVisible,
-      MoveWindow, SetWindowLongA, EVENT_MAX, EVENT_MIN, EVENT_OBJECT_CREATE, EVENT_OBJECT_DESTROY,
-      EVENT_OBJECT_FOCUS, EVENT_OBJECT_HIDE, EVENT_OBJECT_NAMECHANGE, EVENT_OBJECT_SHOW,
-      EVENT_SYSTEM_FOREGROUND, GET_WINDOW_CMD, GWL_EXSTYLE, GWL_STYLE, GW_OWNER, WINDOW_EX_STYLE,
-      WINDOW_STYLE, WINEVENT_OUTOFCONTEXT, WINEVENT_SKIPOWNPROCESS, WS_EX_APPWINDOW,
-      WS_EX_NOACTIVATE, WS_EX_TOOLWINDOW, WS_VISIBLE,
+      EnumWindows, GetParent, MoveWindow, SetWindowLongA, EVENT_MAX, EVENT_MIN, EVENT_OBJECT_CREATE, EVENT_OBJECT_DESTROY,
+      EVENT_OBJECT_HIDE, EVENT_OBJECT_NAMECHANGE, EVENT_OBJECT_SHOW,
+      GWL_EXSTYLE, WINEVENT_OUTOFCONTEXT, WINEVENT_SKIPOWNPROCESS, WS_EX_NOACTIVATE,
     },
   },
 };
@@ -43,7 +40,7 @@ lazy_static! {
 type SetWinEventHookFn =
   unsafe extern "system" fn(u32, u32, *mut HINSTANCE, i32, u32, u32, u32) -> ();
 
-const MARGIN_BOTTOM: i32 = 5;
+pub const MARGIN_BOTTOM: i32 = 5;
 
 impl Dock {
   pub fn new(handle: tauri::AppHandle) -> Self {

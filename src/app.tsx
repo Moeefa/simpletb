@@ -1,11 +1,7 @@
-import {
-  ToggleMultiple16Regular,
-  ToggleMultipleRegular,
-} from "@fluentui/react-icons";
-
 import ActiveWindow from "./components/widgets/active-window";
 import Clock from "./components/widgets/clock";
 import ExecuteButton from "./components/ui/execute-button";
+import { ToggleMultipleRegular } from "@fluentui/react-icons";
 import { Window } from "@tauri-apps/api/window";
 import { invoke } from "@tauri-apps/api/core";
 import { useEffect } from "react";
