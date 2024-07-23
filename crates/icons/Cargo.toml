@@ -1,0 +1,16 @@
+[package]
+name = "icons"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[lints]
+workspace = true
+
+[lib]
+name = "icons"
+path = "src/main.rs"
+
+[dependencies]
+image.workspace = true
+winapi.workspace = true

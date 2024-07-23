@@ -1,0 +1,15 @@
+[package]
+name = "backdrop"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[lints]
+workspace = true
+
+[lib]
+name = "backdrop"
+path = "src/main.rs"
+
+[dependencies]
+windows.workspace = true

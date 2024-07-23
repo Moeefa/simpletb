@@ -1,0 +1,41 @@
+[package]
+name = "simpletb"
+version = "0.1.0"
+edition = "2021"
+publish = false
+build = "build.rs"
+
+[[bin]]
+name = "simpletb"
+path = "src/main.rs"
+
+[lints]
+workspace = true
+
+[lib]
+name = "simpletb"
+path = "src/main.rs"
+
+[dependencies]
+ui.workspace = true
+utils.workspace = true
+backdrop.workspace = true
+handler.workspace = true
+icons.workspace = true
+
+serde.workspace = true
+serde_json.workspace = true
+tokio.workspace = true
+windows.workspace = true
+lazy_static.workspace = true
+active-win-pos-rs.workspace = true
+ctrlc.workspace = true
+regex.workspace = true
+
+tauri.workspace = true
+tauri-plugin-shell.workspace = true
+tauri-plugin-http.workspace = true
+tauri-plugin-process.workspace = true
+
+[build-dependencies]
+tauri-build = { version = "2.0.0-beta", features = [] }
