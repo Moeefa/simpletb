@@ -1,5 +1,5 @@
 [package]
-name = "handler"
+name = "util"
 version = "0.1.0"
 edition = "2021"
 publish = false
@@ -8,11 +8,13 @@ publish = false
 workspace = true
 
 [lib]
-name = "handler"
-path = "src/handler.rs"
+name = "util"
+path = "src/util.rs"
 
 [dependencies]
 tauri.workspace = true
-windows.workspace = true
+lazy_static.workspace = true
 serde_json.workspace = true
-tauri-plugin-shell.workspace = true
+serde.workspace = true
+handler.workspace = true
+windows.workspace = true

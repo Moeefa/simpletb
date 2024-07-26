@@ -20,6 +20,6 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src", "vite-env.d.ts", "crates/ui/src/settings", "crates/ui/src/menubar/round-border", "crates/ui/src/hitbox", "crates/ui/src/dock/Item.tsx", "crates/ui/src/dock/main.tsx"],
+  "include": ["src", "vite-env.d.ts", "crates/ui/src/**/*.tsx"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

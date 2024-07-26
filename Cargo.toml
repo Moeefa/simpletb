@@ -5,7 +5,7 @@ members = [
   "crates/icons",
   "crates/simpletb",
   "crates/ui",
-  "crates/utils",
+  "crates/util",
 ]
 default-members = ["crates/simpletb"]
 resolver = "2"
@@ -13,23 +13,19 @@ resolver = "2"
 [workspace.lints.clippy]
 todo = "deny"
 
-[workspace.build-dependencies]
-tauri-build = { version = "2.0.0-beta", features = [] }
-
 [workspace.dependencies]
 backdrop = { path = "crates/backdrop" }
 handler = { path = "crates/handler" }
 icons = { path = "crates/icons" }
 simpletb = { path = "crates/simpletb" }
 ui = { path = "crates/ui" }
-utils = { path = "crates/utils" }
+util = { path = "crates/util" }
 
 tauri = { version = "2.0.0-beta", features = [] }
 tauri-plugin-shell = "2.0.0-beta"
 tauri-plugin-http = "2.0.0-beta.6"
 tauri-plugin-process = "2.0.0-beta.3"
 
-winapi = { version = "0.3.9", features = ["winuser", "shellapi"] }
 serde = { version = "1", features = ["derive"] }
 simple-home-dir = "0.3.3"
 active-win-pos-rs = "0.8"
@@ -65,4 +61,5 @@ features = [
   "Win32_System_WindowsProgramming",
   "Win32_System_WinRT",
   "Win32_UI_Accessibility",
+  "Win32_Storage_FileSystem",
 ]

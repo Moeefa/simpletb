@@ -9,27 +9,7 @@
     "frontendDist": "../dist"
   },
   "app": {
-    "windows": [
-      {
-        "label": "main",
-        "title": "simpletb",
-        "url": "/crates/ui/src/menubar/index.html",
-        "height": 22,
-        "alwaysOnBottom": false,
-        "alwaysOnTop": true,
-        "decorations": false,
-        "transparent": true,
-        "closable": false,
-        "maximizable": false,
-        "minimizable": true,
-        "resizable": false,
-        "skipTaskbar": true,
-        "focus": false,
-        "shadow": false,
-        "x": 0,
-        "y": 0
-      }
-    ],
+    "windows": [],
     "security": {
       "csp": null
     }

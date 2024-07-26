@@ -1,8 +1,8 @@
 import { Buffer } from "buffer";
 import Label from "./label";
 import Render from "./render";
-import { icons } from "../../../data-icons";
-import { names } from "../../../data-names";
+import { icons } from "../../../displays/data-icons";
+import { names } from "../../../displays/data-names";
 
 export const replaceIcon = (window: { app: string; buffer: number[] }) => {
   return (

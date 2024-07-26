@@ -12,7 +12,7 @@ name = "ui"
 path = "src/ui.rs"
 
 [dependencies]
-utils.workspace = true
+util.workspace = true
 backdrop.workspace = true
 icons.workspace = true
 

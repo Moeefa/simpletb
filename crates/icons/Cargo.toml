@@ -9,8 +9,11 @@ workspace = true
 
 [lib]
 name = "icons"
-path = "src/main.rs"
+path = "src/icons.rs"
 
 [dependencies]
+widestring.workspace = true
+util.workspace = true
+handler.workspace = true
+windows.workspace = true
 image.workspace = true
-winapi.workspace = true

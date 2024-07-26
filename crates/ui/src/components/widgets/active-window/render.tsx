@@ -1,6 +1,7 @@
 import { HTMLAttributes, useEffect, useState } from "react";
 
-import { blacklist } from "../../../data-blacklist";
+import React from "react";
+import { blacklist } from "../../../displays/data-blacklist";
 import { listen } from "@tauri-apps/api/event";
 import { replaceName } from ".";
 

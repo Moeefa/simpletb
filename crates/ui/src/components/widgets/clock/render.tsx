@@ -1,5 +1,7 @@
 import { HTMLAttributes, useEffect, useState } from "react";
 
+import React from "react";
+
 export default function Render({ ...props }: HTMLAttributes<HTMLDivElement>) {
   const [currentTime, setCurrentTime] = useState<string>(
     new Date().toLocaleTimeString("pt-BR", {

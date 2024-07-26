@@ -2,6 +2,8 @@ pub mod hitbox;
 pub mod dock;
 pub mod menubar;
 
-pub use hitbox::*;
-pub use dock::*;
-pub use menubar::*;
+pub fn init_ui() {
+  dock::init();
+  hitbox::init();
+  menubar::init();
+}

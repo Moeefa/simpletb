@@ -9,7 +9,7 @@ workspace = true
 
 [lib]
 name = "backdrop"
-path = "src/main.rs"
+path = "src/backdrop.rs"
 
 [dependencies]
 windows.workspace = true
