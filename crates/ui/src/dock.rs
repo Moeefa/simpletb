@@ -24,6 +24,7 @@ use util::*;
 
 use lazy_static::lazy_static;
 use std::sync::Mutex;
+use std::thread;
 
 #[derive(Clone, serde::Serialize)]
 struct Window {
@@ -59,7 +60,6 @@ pub fn init() {
 
     enum_opened_windows(window.clone());
 
-    window.show().expect("Failed to show dock window");
     enable_blur(hwnd, "#10101000", true).expect("Failed to enable blur");
 
     active_window_event();
@@ -86,6 +86,7 @@ fn setup_window() -> Result<tauri::WebviewWindow, ()> {
   .maximizable(false)
   .minimizable(false)
   .skip_taskbar(true)
+  .visible(false)
   .build()
   .expect("Failed to build dock window");
 
@@ -131,7 +132,7 @@ pub unsafe fn active_window_event() {
     _timestamp: u32,
   ) {
     let window = WINDOW.lock().unwrap();
-    let window_hwnd =
+    let _window_hwnd =
       std::mem::transmute::<isize, HWND>(window.as_ref().unwrap().hwnd().unwrap().0);
 
     match _event_id {
@@ -366,27 +367,32 @@ unsafe extern "system" fn enum_windows_proc(hwnd: HWND, _: LPARAM) -> BOOL {
 }
 
 pub unsafe fn enum_opened_windows(window: tauri::WebviewWindow) {
-  let cloned_window = window.clone();
   let screen_rect = ScreenGeometry::new();
-  window.listen("ready", move |_: tauri::Event| {
+  let cloned_window = window.clone();
+  cloned_window.listen("ready", move |_: tauri::Event| {
+    window.show().expect("Failed to show window");
     EnumWindows(Some(enum_windows_proc), LPARAM(0)).expect("Failed to enum windows");
 
     let length = GLOBAL_APPS.lock().unwrap().len() as i32;
 
-    cloned_window
-      .set_position(PhysicalPosition {
-        x: (screen_rect.width / 2) - ((length * 44 / 2) + 8),
-        y: screen_rect.height - 51 - MARGIN_BOTTOM,
-      })
-      .unwrap();
+    let cloned_window = window.clone();
+    thread::spawn(move || {
+      cloned_window
+        .set_position(PhysicalPosition {
+          x: (screen_rect.width / 2) - ((length * 44 / 2) + 8),
+          y: screen_rect.height - 51 - MARGIN_BOTTOM,
+        })
+        .unwrap();
 
-    cloned_window
-      .set_size(PhysicalSize {
-        width: (length * 44) + 8,
-        height: 51,
-      })
-      .unwrap();
+      cloned_window
+        .set_size(PhysicalSize {
+          width: (length * 44) + 8,
+          height: 51,
+        })
+        .unwrap();
+    });
 
+    let cloned_window = window.clone();
     cloned_window
       .emit("set-apps", GLOBAL_APPS.lock().unwrap().to_vec())
       .expect("Failed to emit add-app event");

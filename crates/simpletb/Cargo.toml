@@ -16,7 +16,6 @@ workspace = true
 ui.workspace = true
 util.workspace = true
 backdrop.workspace = true
-handler.workspace = true
 icons.workspace = true
 
 serde.workspace = true
@@ -33,6 +32,8 @@ tauri-plugin-shell.workspace = true
 tauri-plugin-http.workspace = true
 tauri-plugin-process.workspace = true
 once_cell = "1.19.0"
+url = "2.5.2"
+log = "0.4.22"
 
 [build-dependencies]
 tauri-build = { version = "2.0.0-beta", features = [] }

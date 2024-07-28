@@ -1,7 +1,6 @@
 [workspace]
 members = [
   "crates/backdrop",
-  "crates/handler",
   "crates/icons",
   "crates/simpletb",
   "crates/ui",
@@ -15,13 +14,12 @@ todo = "deny"
 
 [workspace.dependencies]
 backdrop = { path = "crates/backdrop" }
-handler = { path = "crates/handler" }
+util = { path = "crates/util" }
 icons = { path = "crates/icons" }
 simpletb = { path = "crates/simpletb" }
 ui = { path = "crates/ui" }
-util = { path = "crates/util" }
 
-tauri = { version = "2.0.0-beta", features = [] }
+tauri = { version = "2.0.0-beta" }
 tauri-plugin-shell = "2.0.0-beta"
 tauri-plugin-http = "2.0.0-beta.6"
 tauri-plugin-process = "2.0.0-beta.3"
@@ -41,6 +39,10 @@ tokio = "1.37.0"
 sysinfo = "0.30.11"
 lazy_static = "1.4.0"
 raw-window-handle = "0.6.1"
+url = "2.5.2"
+log = "0.4.22"
+xml = "0.8.20"
+walkdir = "2"
 
 [workspace.dependencies.windows]
 version = "0.52"
@@ -62,4 +64,7 @@ features = [
   "Win32_System_WinRT",
   "Win32_UI_Accessibility",
   "Win32_Storage_FileSystem",
+  "ApplicationModel",
+  "Foundation_Collections",
+  "Management_Deployment_Preview",
 ]

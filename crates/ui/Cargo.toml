@@ -16,6 +16,7 @@ util.workspace = true
 backdrop.workspace = true
 icons.workspace = true
 
+active-win-pos-rs.workspace = true
 serde.workspace = true
 serde_json.workspace = true
 lazy_static.workspace = true

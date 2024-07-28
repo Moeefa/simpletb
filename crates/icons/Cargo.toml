@@ -12,8 +12,10 @@ name = "icons"
 path = "src/icons.rs"
 
 [dependencies]
+regex.workspace = true
+xml.workspace = true
 widestring.workspace = true
 util.workspace = true
-handler.workspace = true
 windows.workspace = true
 image.workspace = true
+walkdir.workspace = true

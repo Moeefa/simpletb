@@ -1,10 +1,9 @@
-import { Reorder, motion } from "framer-motion";
 import { emit, listen } from "@tauri-apps/api/event";
+import { Reorder, motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 
-import { Buffer } from "buffer";
-import React from "react";
 import { invoke } from "@tauri-apps/api/core";
+import { Buffer } from "buffer";
 
 type App = {
   hwnd: number;
@@ -18,17 +17,21 @@ function App() {
   const isJustReordered = useRef(false);
 
   useEffect(() => {
-    listen<App[]>("set-apps", (event) => setApps(event.payload));
+    listen<App[]>("set-apps", (event) => {
+      console.log(event.payload);
+      setApps(event.payload);
+    });
 
     listen<{ message: string; buffer: number[]; hwnd: number }>(
       "active-window",
       (event) => {
+        console.log(event.payload);
         if (typeof event.payload === "number") {
           setActive(event.payload);
         } else {
           setActive(event.payload.hwnd);
         }
-      }
+      },
     );
 
     listen("hover-hitbox", () => {
@@ -95,13 +98,19 @@ function App() {
               });
             }}
           >
-            <motion.img
-              draggable="false"
-              className="object-scale-down select-none aspect-square h-[1.45rem] group-data-[active=true]:animate-[bounce-up_0.55s_ease-in-out_1] group-data-[active=false]:animate-[bounce-down_0.55s_ease-in-out_1]"
-              src={`data:image/png;base64,${Buffer.from(
-                app.buffer || 0
-              ).toString("base64")}`}
-            />
+            {app.buffer.length === 0 ? (
+              <motion.h1 className="text-lg group-data-[active=true]:animate-[bounce-up_0.55s_ease-in-out_1] group-data-[active=false]:animate-[bounce-down_0.55s_ease-in-out_1]">
+                ❔
+              </motion.h1>
+            ) : (
+              <motion.img
+                draggable="false"
+                className="object-scale-down select-none aspect-square h-[1.45rem] group-data-[active=true]:animate-[bounce-up_0.55s_ease-in-out_1] group-data-[active=false]:animate-[bounce-down_0.55s_ease-in-out_1]"
+                src={`data:image/png;base64,${Buffer.from(
+                  app.buffer || [],
+                ).toString("base64")}`}
+              />
+            )}
             <motion.div className="absolute duration-300 ease-in-out transition-all group-data-[active=true]:w-4 group-data-[active=false]:w-1.5 h-[0.18rem] group-data-[active=true]:bg-blue-400 group-data-[active=false]:bg-neutral-400 bottom-0 rounded-full" />
           </Reorder.Item>
         );
