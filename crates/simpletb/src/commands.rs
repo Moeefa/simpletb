@@ -5,23 +5,26 @@ use tauri::{
   Manager,
 };
 use util::{ScreenGeometry, MARGIN_BOTTOM};
-use windows::{
-  core::{PCSTR, PSTR},
-  Win32::{
-    Foundation::{CloseHandle, HWND},
-    System::Threading::{
-      CreateProcessA, WaitForInputIdle, CREATE_NEW_CONSOLE, INFINITE, PROCESS_INFORMATION,
-      STARTUPINFOA,
-    },
-    UI::{
-      Input::KeyboardAndMouse::SetFocus,
-      WindowsAndMessaging::{
-        GetForegroundWindow, GetWindowPlacement, MoveWindow, SetForegroundWindow, ShowWindow,
-        SW_MINIMIZE, SW_RESTORE, WINDOWPLACEMENT,
-      },
-    },
-  },
-};
+
+use windows::core::PCSTR;
+use windows::core::PSTR;
+use windows::Win32::Foundation::CloseHandle;
+use windows::Win32::Foundation::HWND;
+use windows::Win32::System::Threading::CreateProcessA;
+use windows::Win32::System::Threading::WaitForInputIdle;
+use windows::Win32::System::Threading::CREATE_NEW_CONSOLE;
+use windows::Win32::System::Threading::INFINITE;
+use windows::Win32::System::Threading::PROCESS_INFORMATION;
+use windows::Win32::System::Threading::STARTUPINFOA;
+use windows::Win32::UI::Input::KeyboardAndMouse::SetFocus;
+use windows::Win32::UI::WindowsAndMessaging::GetForegroundWindow;
+use windows::Win32::UI::WindowsAndMessaging::GetWindowPlacement;
+use windows::Win32::UI::WindowsAndMessaging::MoveWindow;
+use windows::Win32::UI::WindowsAndMessaging::SetForegroundWindow;
+use windows::Win32::UI::WindowsAndMessaging::ShowWindow;
+use windows::Win32::UI::WindowsAndMessaging::SW_MINIMIZE;
+use windows::Win32::UI::WindowsAndMessaging::SW_RESTORE;
+use windows::Win32::UI::WindowsAndMessaging::WINDOWPLACEMENT;
 
 #[tauri::command]
 pub fn show_window(hwnd: isize) {
@@ -140,8 +143,8 @@ pub fn execute(commandline: String, mut applicationname: String) {
     .is_ok()
     {
       WaitForInputIdle(process_info.hProcess, INFINITE);
-      CloseHandle(process_info.hProcess).expect("Failed to close process");
-      CloseHandle(process_info.hThread).expect("Failed to close thread");
+      CloseHandle(process_info.hProcess).unwrap_or_else(|_| println!("Failed to close process"));
+      CloseHandle(process_info.hThread).unwrap_or_else(|_| println!("Failed to close thread"));
     } else {
       println!("Failed to create process");
     }

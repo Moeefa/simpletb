@@ -10,7 +10,7 @@
   }
 
   body {
-    @apply text-sm;
+    @apply text-xs;
   }
 
   #root {

@@ -90,14 +90,12 @@ unsafe extern "system" fn win_event_hook_callback(
           && !*IS_FULLSCREEN.lock().unwrap()
         {
           println!("{} {:?}", active_window.app_name, is_cursor_visible());
-          app_handle
-            .emit("app-fullscreen", ())
-            .expect("Failed to emit app fullscreen");
+          app_handle.emit("app-fullscreen", ()).unwrap_or_else(|_| ());
         } else {
           if active_window.app_name != "Windows Explorer" {
             app_handle
               .emit("app-not-fullscreen", ())
-              .expect("Failed to emit app fullscreen");
+              .unwrap_or_else(|_| ());
           }
         }
 
@@ -116,7 +114,7 @@ unsafe extern "system" fn win_event_hook_callback(
                 hwnd: active_window_hwnd,
               },
             )
-            .expect("Failed to emit active window");
+            .unwrap_or_else(|_| ());
         }
       }
       Err(_err) => {
@@ -131,7 +129,7 @@ unsafe extern "system" fn win_event_hook_callback(
               hwnd: -1,
             },
           )
-          .expect("Failed to emit default active window");
+          .unwrap_or_else(|_| ());
       }
     },
     _ => {}

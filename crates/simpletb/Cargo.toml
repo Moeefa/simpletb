@@ -24,16 +24,16 @@ tokio.workspace = true
 windows.workspace = true
 lazy_static.workspace = true
 active-win-pos-rs.workspace = true
-ctrlc.workspace = true
 regex.workspace = true
 
 tauri.workspace = true
 tauri-plugin-shell.workspace = true
 tauri-plugin-http.workspace = true
 tauri-plugin-process.workspace = true
-once_cell = "1.19.0"
-url = "2.5.2"
-log = "0.4.22"
+log.workspace = true
+simple_logger.workspace = true
 
 [build-dependencies]
 tauri-build = { version = "2.0.0-beta", features = [] }
+log.workspace = true
+simple_logger.workspace = true

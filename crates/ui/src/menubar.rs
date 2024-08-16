@@ -92,10 +92,10 @@ pub fn create_round_window() -> Result<WebviewWindow, String> {
   .build()
   .expect("Failed to create window");
 
-  // webview_window
-  //   .clone()
-  //   .set_ignore_cursor_events(true)
-  //   .unwrap();
+  webview_window
+    .clone()
+    .set_ignore_cursor_events(true)
+    .unwrap();
 
   let hwnd: HWND = unsafe { std::mem::transmute(webview_window.hwnd().unwrap().0) };
 

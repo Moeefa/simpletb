@@ -26,7 +26,7 @@ pub fn init() {
     window
       .app_handle()
       .emit("hide-taskbar", ())
-      .expect("Failed to emit hide-taskbar event");
+      .unwrap_or_else(|_| ());
   });
 }
 
@@ -46,7 +46,7 @@ pub fn setup_window() -> Result<tauri::WebviewWindow, ()> {
   .shadow(false)
   .skip_taskbar(true)
   .build()
-  .expect("Failed to build dock window");
+  .expect("Failed to build hitbox window");
 
   Ok(window)
 }

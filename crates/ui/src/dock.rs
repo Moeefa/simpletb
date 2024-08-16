@@ -186,7 +186,7 @@ pub unsafe fn active_window_event() {
 
           window
             .emit("set-apps", GLOBAL_APPS.lock().unwrap().to_vec())
-            .expect("Failed to emit add-app event");
+            .unwrap_or_else(|_| ());
         }
       }
       EVENT_OBJECT_DESTROY => {
@@ -220,7 +220,7 @@ pub unsafe fn active_window_event() {
 
           window
             .emit("set-apps", GLOBAL_APPS.lock().unwrap().to_vec())
-            .expect("Failed to emit add-app event");
+            .unwrap_or_else(|_| ());
         }
       }
       EVENT_OBJECT_NAMECHANGE => {
@@ -257,7 +257,7 @@ pub unsafe fn active_window_event() {
 
           window
             .emit("set-apps", GLOBAL_APPS.lock().unwrap().to_vec())
-            .expect("Failed to emit add-app event");
+            .unwrap_or_else(|_| ());
         }
       }
       EVENT_OBJECT_HIDE => {
@@ -278,7 +278,7 @@ pub unsafe fn active_window_event() {
 
             window
               .emit("set-apps", GLOBAL_APPS.lock().unwrap().to_vec())
-              .expect("Failed to emit add-app event");
+              .unwrap_or_else(|_| ());
           } else {
             if !is_real_window(_window_handle, false) {
               GLOBAL_APPS
@@ -305,7 +305,7 @@ pub unsafe fn active_window_event() {
 
               window
                 .emit("set-apps", GLOBAL_APPS.lock().unwrap().to_vec())
-                .expect("Failed to emit add-app event");
+                .unwrap_or_else(|_| ());
             }
           }
         }
@@ -343,7 +343,7 @@ unsafe extern "system" fn enum_windows_proc(hwnd: HWND, _: LPARAM) -> BOOL {
     GLOBAL_APPS.lock().unwrap().push(Window {
       hwnd: hwnd.0,
       path: exe_path.clone(),
-      buffer: get_icon(&exe_path).expect("Failed to get icon"),
+      buffer: get_icon(&exe_path).unwrap_or_else(|_| Vec::new()),
     });
   }
 
@@ -354,8 +354,8 @@ pub unsafe fn enum_opened_windows(window: tauri::WebviewWindow) {
   let screen_rect = ScreenGeometry::new();
   let cloned_window = window.clone();
   cloned_window.listen("ready", move |_: tauri::Event| {
-    window.show().expect("Failed to show window");
-    EnumWindows(Some(enum_windows_proc), LPARAM(0)).expect("Failed to enum windows");
+    window.show().unwrap_or_else(|_| ());
+    EnumWindows(Some(enum_windows_proc), LPARAM(0)).unwrap_or_else(|_| ());
 
     let length = GLOBAL_APPS.lock().unwrap().len() as i32;
 
@@ -379,6 +379,6 @@ pub unsafe fn enum_opened_windows(window: tauri::WebviewWindow) {
     let cloned_window = window.clone();
     cloned_window
       .emit("set-apps", GLOBAL_APPS.lock().unwrap().to_vec())
-      .expect("Failed to emit add-app event");
+      .unwrap_or_else(|_| ());
   });
 }
