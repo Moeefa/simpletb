@@ -1,11 +1,16 @@
 import { emit, listen } from "@tauri-apps/api/event";
 
-import React from "react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 let timeout: NodeJS.Timeout;
-function App() {
+export function Hitbox() {
+  const [fullscreen, setFullscreen] = useState(false);
+
+  console.log(fullscreen);
   useEffect(() => {
+    listen("app-fullscreen", () => setFullscreen(true));
+    listen("app-not-fullscreen", () => setFullscreen(false));
+
     listen("hover-bar", () => {
       console.log("hover-bar");
       clearTimeout(timeout);
@@ -27,5 +32,3 @@ function App() {
 
   return <div className="h-full w-full bg-transparent" />;
 }
-
-export default App;

@@ -1,8 +1,8 @@
 import { HTMLAttributes, useEffect, useState } from "react";
 
+import { blacklist } from "@/displays/data/data-blacklist";
 import { listen } from "@tauri-apps/api/event";
 import { replaceName } from ".";
-import { blacklist } from "../../../displays/data-blacklist";
 
 export default function Render({ ...props }: HTMLAttributes<HTMLDivElement>) {
   const [activeWindow, setActiveWindow] = useState<{

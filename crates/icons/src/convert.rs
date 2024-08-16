@@ -1,6 +1,8 @@
 use image::ImageBuffer;
 use image::RgbaImage;
+
 use util::Result;
+
 use windows::Win32::Graphics::Gdi::CreateCompatibleDC;
 use windows::Win32::Graphics::Gdi::DeleteDC;
 use windows::Win32::Graphics::Gdi::DeleteObject;
@@ -41,7 +43,7 @@ pub fn bgra_to_rgba(data: &mut [u8]) {
   }
 }
 
-pub fn convert_hicon_to_rgba_image(hicon: &HICON) -> Result<RgbaImage> {
+pub fn hicon_to_rgba(hicon: &HICON) -> Result<RgbaImage> {
   unsafe {
     let mut icon_info = ICONINFOEXW {
       cbSize: std::mem::size_of::<ICONINFOEXW>() as u32,

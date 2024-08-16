@@ -4,17 +4,26 @@ use tauri::Listener;
 use tauri::PhysicalPosition;
 use tauri::PhysicalSize;
 
-use ::windows::Win32::{
-  Foundation::{BOOL, HINSTANCE, HWND, LPARAM},
-  UI::{
-    Accessibility::{SetWinEventHook, HWINEVENTHOOK},
-    WindowsAndMessaging::{
-      EnumWindows, GetParent, SetWindowLongA, EVENT_MAX, EVENT_MIN, EVENT_OBJECT_CREATE,
-      EVENT_OBJECT_DESTROY, EVENT_OBJECT_HIDE, EVENT_OBJECT_NAMECHANGE, EVENT_OBJECT_SHOW,
-      GWL_EXSTYLE, WINEVENT_OUTOFCONTEXT, WINEVENT_SKIPOWNPROCESS, WS_EX_NOACTIVATE,
-    },
-  },
-};
+use ::windows::Win32::Foundation::BOOL;
+use ::windows::Win32::Foundation::HINSTANCE;
+use ::windows::Win32::Foundation::HWND;
+use ::windows::Win32::Foundation::LPARAM;
+use ::windows::Win32::UI::Accessibility::SetWinEventHook;
+use ::windows::Win32::UI::Accessibility::HWINEVENTHOOK;
+use ::windows::Win32::UI::WindowsAndMessaging::EnumWindows;
+use ::windows::Win32::UI::WindowsAndMessaging::GetParent;
+use ::windows::Win32::UI::WindowsAndMessaging::SetWindowLongA;
+use ::windows::Win32::UI::WindowsAndMessaging::EVENT_MAX;
+use ::windows::Win32::UI::WindowsAndMessaging::EVENT_MIN;
+use ::windows::Win32::UI::WindowsAndMessaging::EVENT_OBJECT_CREATE;
+use ::windows::Win32::UI::WindowsAndMessaging::EVENT_OBJECT_DESTROY;
+use ::windows::Win32::UI::WindowsAndMessaging::EVENT_OBJECT_HIDE;
+use ::windows::Win32::UI::WindowsAndMessaging::EVENT_OBJECT_NAMECHANGE;
+use ::windows::Win32::UI::WindowsAndMessaging::EVENT_OBJECT_SHOW;
+use ::windows::Win32::UI::WindowsAndMessaging::GWL_EXSTYLE;
+use ::windows::Win32::UI::WindowsAndMessaging::WINEVENT_OUTOFCONTEXT;
+use ::windows::Win32::UI::WindowsAndMessaging::WINEVENT_SKIPOWNPROCESS;
+use ::windows::Win32::UI::WindowsAndMessaging::WS_EX_NOACTIVATE;
 
 use util::ScreenGeometry;
 
@@ -23,6 +32,7 @@ use icons::get_icon;
 use util::*;
 
 use lazy_static::lazy_static;
+use std::path::PathBuf;
 use std::sync::Mutex;
 use std::thread;
 
@@ -75,7 +85,7 @@ fn setup_window() -> Result<tauri::WebviewWindow, ()> {
   let window = tauri::WebviewWindowBuilder::new(
     unsafe { APP_HANDLE.as_ref().unwrap() },
     "dock",
-    tauri::WebviewUrl::App("/crates/ui/src/displays/dock/index.html".into()),
+    tauri::WebviewUrl::App(PathBuf::from("/#/dock")),
   )
   .title("Dock")
   .transparent(true)
@@ -131,9 +141,9 @@ pub unsafe fn active_window_event() {
     _thread_id: u32,
     _timestamp: u32,
   ) {
-    let window = WINDOW.lock().unwrap();
-    let _window_hwnd =
-      std::mem::transmute::<isize, HWND>(window.as_ref().unwrap().hwnd().unwrap().0);
+    let binding = WINDOW.lock().unwrap();
+    let window = binding.as_ref().unwrap();
+    let _window_hwnd = std::mem::transmute::<isize, HWND>(window.hwnd().unwrap().0);
 
     match _event_id {
       EVENT_OBJECT_SHOW | EVENT_OBJECT_CREATE => {
@@ -161,8 +171,6 @@ pub unsafe fn active_window_event() {
           let length = GLOBAL_APPS.lock().unwrap().len() as i32;
           let screen_rect = ScreenGeometry::new();
           window
-            .as_ref()
-            .unwrap()
             .set_position(PhysicalPosition {
               x: (screen_rect.width / 2) - ((length * 44 / 2) + 8),
               y: screen_rect.height - 51 - MARGIN_BOTTOM,
@@ -170,8 +178,6 @@ pub unsafe fn active_window_event() {
             .unwrap();
 
           window
-            .as_ref()
-            .unwrap()
             .set_size(PhysicalSize {
               width: (length * 44) + 8,
               height: 51,
@@ -179,8 +185,6 @@ pub unsafe fn active_window_event() {
             .unwrap();
 
           window
-            .as_ref()
-            .unwrap()
             .emit("set-apps", GLOBAL_APPS.lock().unwrap().to_vec())
             .expect("Failed to emit add-app event");
         }
@@ -201,8 +205,6 @@ pub unsafe fn active_window_event() {
           let screen_rect = ScreenGeometry::new();
 
           window
-            .as_ref()
-            .unwrap()
             .set_position(PhysicalPosition {
               x: (screen_rect.width / 2) - ((length * 44 / 2) + 8),
               y: screen_rect.height - 51 - MARGIN_BOTTOM,
@@ -210,8 +212,6 @@ pub unsafe fn active_window_event() {
             .unwrap();
 
           window
-            .as_ref()
-            .unwrap()
             .set_size(PhysicalSize {
               width: (length * 44) + 8,
               height: 51,
@@ -219,8 +219,6 @@ pub unsafe fn active_window_event() {
             .unwrap();
 
           window
-            .as_ref()
-            .unwrap()
             .emit("set-apps", GLOBAL_APPS.lock().unwrap().to_vec())
             .expect("Failed to emit add-app event");
         }
@@ -244,8 +242,6 @@ pub unsafe fn active_window_event() {
           let length = GLOBAL_APPS.lock().unwrap().len() as i32;
           let screen_rect = ScreenGeometry::new();
           window
-            .as_ref()
-            .unwrap()
             .set_position(PhysicalPosition {
               x: (screen_rect.width / 2) - ((length * 44 / 2) + 8),
               y: screen_rect.height - 51 - MARGIN_BOTTOM,
@@ -253,8 +249,6 @@ pub unsafe fn active_window_event() {
             .unwrap();
 
           window
-            .as_ref()
-            .unwrap()
             .set_size(PhysicalSize {
               width: (length * 44) + 8,
               height: 51,
@@ -262,8 +256,6 @@ pub unsafe fn active_window_event() {
             .unwrap();
 
           window
-            .as_ref()
-            .unwrap()
             .emit("set-apps", GLOBAL_APPS.lock().unwrap().to_vec())
             .expect("Failed to emit add-app event");
         }
@@ -285,8 +277,6 @@ pub unsafe fn active_window_event() {
             }
 
             window
-              .as_ref()
-              .unwrap()
               .emit("set-apps", GLOBAL_APPS.lock().unwrap().to_vec())
               .expect("Failed to emit add-app event");
           } else {
@@ -300,8 +290,6 @@ pub unsafe fn active_window_event() {
               let screen_rect = ScreenGeometry::new();
 
               window
-                .as_ref()
-                .unwrap()
                 .set_position(PhysicalPosition {
                   x: (screen_rect.width / 2) - ((length * 44 / 2) + 8),
                   y: screen_rect.height - 51 - MARGIN_BOTTOM,
@@ -309,8 +297,6 @@ pub unsafe fn active_window_event() {
                 .unwrap();
 
               window
-                .as_ref()
-                .unwrap()
                 .set_size(PhysicalSize {
                   width: (length * 44) + 8,
                   height: 51,
@@ -318,8 +304,6 @@ pub unsafe fn active_window_event() {
                 .unwrap();
 
               window
-                .as_ref()
-                .unwrap()
                 .emit("set-apps", GLOBAL_APPS.lock().unwrap().to_vec())
                 .expect("Failed to emit add-app event");
             }

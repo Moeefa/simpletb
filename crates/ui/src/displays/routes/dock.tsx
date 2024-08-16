@@ -11,7 +11,7 @@ type App = {
 };
 
 let timeout: NodeJS.Timeout;
-function App() {
+export function Dock() {
   const [active, setActive] = useState<number>(-1);
   const [apps, setApps] = useState<App[]>([]);
   const isJustReordered = useRef(false);
@@ -118,5 +118,3 @@ function App() {
     </Reorder.Group>
   );
 }
-
-export default App;

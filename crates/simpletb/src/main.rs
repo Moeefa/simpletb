@@ -4,11 +4,8 @@
 mod commands;
 mod hooks;
 
-use commands::{execute, open_context, open_settings, show_window};
-use hooks::setup_event_listeners;
+use commands::*;
 use util::APP_HANDLE;
-
-use std::env;
 
 fn main() {
   // Initialize Tokio runtime
@@ -44,14 +41,18 @@ fn initialize_tauri_app() -> tauri::Builder<tauri::Wry> {
 
 // Function to setup Tauri application
 fn setup_tauri_app(app_builder: tauri::Builder<tauri::Wry>) -> tauri::Builder<tauri::Wry> {
-  app_builder.setup(move |app| {
-    // Initialize app handle
-    unsafe { APP_HANDLE = Some(app.handle().clone()) };
+  app_builder
+    .setup(move |app| {
+      // Initialize app handle
+      unsafe { APP_HANDLE = Some(app.handle().clone()) };
 
-    setup_event_listeners();
+      hooks::init();
+      ui::init();
 
-    ui::init_ui();
-
-    Ok(())
-  })
+      Ok(())
+    })
+    .on_window_event(|_window, event| match event {
+      tauri::WindowEvent::Destroyed | tauri::WindowEvent::CloseRequested { .. } => ui::kill(),
+      _ => {}
+    })
 }

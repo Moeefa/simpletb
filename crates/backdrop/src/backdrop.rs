@@ -1,17 +1,16 @@
 mod hex_converter;
 
 use std::mem;
+
+use windows::core::PCSTR;
+use windows::Win32::Foundation::BOOL;
+use windows::Win32::Foundation::HWND;
 use windows::Win32::Graphics::Dwm::DwmSetWindowAttribute;
 use windows::Win32::Graphics::Dwm::DWMSBT_MAINWINDOW;
 use windows::Win32::Graphics::Dwm::DWMWA_SYSTEMBACKDROP_TYPE;
 use windows::Win32::Graphics::Dwm::DWMWINDOWATTRIBUTE;
-use windows::{
-  core::PCSTR,
-  Win32::{
-    Foundation::{BOOL, HWND},
-    System::LibraryLoader::{GetProcAddress, LoadLibraryA},
-  },
-};
+use windows::Win32::System::LibraryLoader::GetProcAddress;
+use windows::Win32::System::LibraryLoader::LoadLibraryA;
 
 use crate::hex_converter::hex_to_rgba_int;
 
@@ -32,6 +31,9 @@ struct WINDOWCOMPOSITIONATTRIBDATA {
   pvData: *mut std::ffi::c_void,
   cbData: usize,
 }
+
+const ACCENT_ENABLE_ACRYLICBLURBEHIND: i32 = 4;
+const WCA_ACCENT_POLICY: i32 = 19;
 
 type SetWindowCompositionAttributeFn =
   unsafe extern "system" fn(HWND, *mut WINDOWCOMPOSITIONATTRIBDATA) -> BOOL;
@@ -59,14 +61,14 @@ pub fn enable_blur(hwnd: HWND, hex: &str, always_active: bool) -> Result<(), &'s
 
   // Always active backdrop
   let accent = ACCENT_POLICY {
-    nAccentState: 4,
+    nAccentState: ACCENT_ENABLE_ACRYLICBLURBEHIND,
     nFlags: 2,
     nGradientColor: hex_to_rgba_int(hex).unwrap() as i32,
     nAnimationId: 0,
   };
 
   let mut data = WINDOWCOMPOSITIONATTRIBDATA {
-    Attrib: 19,
+    Attrib: WCA_ACCENT_POLICY,
     pvData: &accent as *const _ as *mut _,
     cbData: mem::size_of::<ACCENT_POLICY>(),
   };

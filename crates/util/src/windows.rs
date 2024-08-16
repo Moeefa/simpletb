@@ -1,26 +1,59 @@
 use std::path::Path;
 
-use windows::{
-  core::{PCWSTR, PWSTR},
-  Win32::{
-    Foundation::{CloseHandle, HANDLE, HWND, LPARAM, MAX_PATH},
-    System::Threading::{
-      OpenProcess, QueryFullProcessImageNameW, PROCESS_ACCESS_RIGHTS, PROCESS_NAME_WIN32,
-      PROCESS_QUERY_INFORMATION, PROCESS_QUERY_LIMITED_INFORMATION,
-    },
-    UI::{
-      Shell::{SHAppBarMessage, ABM_SETSTATE, ABS_ALWAYSONTOP, ABS_AUTOHIDE, APPBARDATA},
-      WindowsAndMessaging::{
-        FindWindowW, GetClassNameW, GetParent, GetWindow, GetWindowLongW, GetWindowTextW,
-        GetWindowThreadProcessId, IsWindowVisible, ShowWindow, GWL_EXSTYLE, GWL_STYLE, GW_OWNER,
-        SW_HIDE, SW_SHOWNORMAL, WINDOW_EX_STYLE, WINDOW_STYLE, WS_EX_APPWINDOW, WS_EX_NOACTIVATE,
-        WS_EX_TOOLWINDOW, WS_VISIBLE,
-      },
-    },
-  },
-};
+use windows::core::PCWSTR;
+use windows::core::PWSTR;
+use windows::Win32::Foundation::CloseHandle;
+use windows::Win32::Foundation::HANDLE;
+use windows::Win32::Foundation::HWND;
+use windows::Win32::Foundation::LPARAM;
+use windows::Win32::Foundation::MAX_PATH;
+use windows::Win32::System::Threading::OpenProcess;
+use windows::Win32::System::Threading::QueryFullProcessImageNameW;
+use windows::Win32::System::Threading::PROCESS_ACCESS_RIGHTS;
+use windows::Win32::System::Threading::PROCESS_NAME_WIN32;
+use windows::Win32::System::Threading::PROCESS_QUERY_LIMITED_INFORMATION;
+use windows::Win32::UI::Shell::SHAppBarMessage;
+use windows::Win32::UI::Shell::ABM_SETSTATE;
+use windows::Win32::UI::Shell::ABS_ALWAYSONTOP;
+use windows::Win32::UI::Shell::ABS_AUTOHIDE;
+use windows::Win32::UI::Shell::APPBARDATA;
+use windows::Win32::UI::WindowsAndMessaging::FindWindowW;
+use windows::Win32::UI::WindowsAndMessaging::GetClassNameW;
+use windows::Win32::UI::WindowsAndMessaging::GetCursorInfo;
+use windows::Win32::UI::WindowsAndMessaging::GetParent;
+use windows::Win32::UI::WindowsAndMessaging::GetWindow;
+use windows::Win32::UI::WindowsAndMessaging::GetWindowLongW;
+use windows::Win32::UI::WindowsAndMessaging::GetWindowTextW;
+use windows::Win32::UI::WindowsAndMessaging::GetWindowThreadProcessId;
+use windows::Win32::UI::WindowsAndMessaging::IsWindowVisible;
+use windows::Win32::UI::WindowsAndMessaging::ShowWindow;
+use windows::Win32::UI::WindowsAndMessaging::CURSORINFO;
+use windows::Win32::UI::WindowsAndMessaging::CURSOR_SHOWING;
+use windows::Win32::UI::WindowsAndMessaging::GWL_EXSTYLE;
+use windows::Win32::UI::WindowsAndMessaging::GWL_STYLE;
+use windows::Win32::UI::WindowsAndMessaging::GW_OWNER;
+use windows::Win32::UI::WindowsAndMessaging::SW_HIDE;
+use windows::Win32::UI::WindowsAndMessaging::SW_SHOWNORMAL;
+use windows::Win32::UI::WindowsAndMessaging::WINDOW_EX_STYLE;
+use windows::Win32::UI::WindowsAndMessaging::WINDOW_STYLE;
+use windows::Win32::UI::WindowsAndMessaging::WS_EX_APPWINDOW;
+use windows::Win32::UI::WindowsAndMessaging::WS_EX_NOACTIVATE;
+use windows::Win32::UI::WindowsAndMessaging::WS_EX_TOOLWINDOW;
+use windows::Win32::UI::WindowsAndMessaging::WS_VISIBLE;
 
 use crate::{AppError, Result};
+
+pub fn is_cursor_visible() -> bool {
+  unsafe {
+    let mut cursor_info = CURSORINFO {
+      cbSize: std::mem::size_of::<CURSORINFO>() as u32,
+      ..Default::default()
+    };
+
+    GetCursorInfo(&mut cursor_info as *mut CURSORINFO).unwrap();
+    cursor_info.flags == CURSOR_SHOWING
+  }
+}
 
 pub fn get_class(hwnd: HWND) -> Result<String> {
   let mut text = [0u16; 512];

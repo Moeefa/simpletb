@@ -64,6 +64,7 @@ features = [
   "Win32_System_WinRT",
   "Win32_UI_Accessibility",
   "Win32_Storage_FileSystem",
+  "Win32_UI_Input_KeyboardAndMouse",
   "ApplicationModel",
   "Foundation_Collections",
   "Management_Deployment_Preview",

@@ -1,4 +1,4 @@
-import React, { HTMLAttributes } from "react";
+import { HTMLAttributes } from "react";
 
 import { invoke } from "@tauri-apps/api/core";
 
@@ -19,7 +19,7 @@ export default function ExecuteButton({
           commandline,
         })
       }
-      className="cursor-default hover:bg-neutral-800/80 px-1.5 rounded-sm"
+      className="cursor-default hover:bg-neutral-800/40 px-1.5 py-0.5 rounded-md"
       {...props}
     >
       {children}

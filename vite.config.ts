@@ -1,6 +1,6 @@
-import { defineConfig } from "vite";
-import path from "path";
 import react from "@vitejs/plugin-react";
+import path from "path";
+import { defineConfig } from "vite";
 
 // https://vitejs.dev/config/
 export default defineConfig(async () => ({
@@ -8,7 +8,8 @@ export default defineConfig(async () => ({
 
   resolve: {
     alias: {
-      "@": path.resolve(__dirname, "src"),
+      "@": path.resolve(__dirname, "crates/ui/src"),
+      "@assets": path.resolve(__dirname, "assets"),
     },
   },
 

@@ -9,34 +9,23 @@ use windows::{
   core::{PCSTR, PSTR},
   Win32::{
     Foundation::{CloseHandle, HWND},
-    System::{
-      LibraryLoader::{GetProcAddress, LoadLibraryA},
-      Threading::{
-        CreateProcessA, WaitForInputIdle, CREATE_NEW_CONSOLE, INFINITE, PROCESS_INFORMATION,
-        STARTUPINFOA,
-      },
+    System::Threading::{
+      CreateProcessA, WaitForInputIdle, CREATE_NEW_CONSOLE, INFINITE, PROCESS_INFORMATION,
+      STARTUPINFOA,
     },
-    UI::WindowsAndMessaging::{
-      GetForegroundWindow, GetWindowPlacement, MoveWindow, SetForegroundWindow, ShowWindow,
-      SW_MINIMIZE, SW_RESTORE, WINDOWPLACEMENT,
+    UI::{
+      Input::KeyboardAndMouse::SetFocus,
+      WindowsAndMessaging::{
+        GetForegroundWindow, GetWindowPlacement, MoveWindow, SetForegroundWindow, ShowWindow,
+        SW_MINIMIZE, SW_RESTORE, WINDOWPLACEMENT,
+      },
     },
   },
 };
 
-type SetFocusFn = unsafe extern "system" fn(HWND) -> HWND;
-
 #[tauri::command]
 pub fn show_window(hwnd: isize) {
   unsafe {
-    let hmodule =
-      LoadLibraryA(PCSTR("user32.dll\0".as_ptr() as *const u8)).expect("Failed to load user32.dll");
-
-    #[allow(non_snake_case)]
-    let SetFocus: SetFocusFn = std::mem::transmute(
-      GetProcAddress(hmodule, PCSTR("SetFocus\0".as_ptr() as *const u8))
-        .expect("Failed to get SetFocus address"),
-    );
-
     let hwnd: HWND = std::mem::transmute(hwnd);
     let mut placement: WINDOWPLACEMENT = WINDOWPLACEMENT::default();
     GetWindowPlacement(hwnd, &mut placement).expect("Failed to get window placement");

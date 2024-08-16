@@ -1,13 +1,11 @@
+import { invoke } from "@tauri-apps/api/core";
+import { Window } from "@tauri-apps/api/window";
+import { useEffect } from "react";
+import ExecuteButton from "../../components/ui/execute-button";
 import ActiveWindow from "../../components/widgets/active-window";
 import Clock from "../../components/widgets/clock";
-import ExecuteButton from "../../components/ui/execute-button";
-import React from "react";
-import { ToggleMultipleRegular } from "@fluentui/react-icons";
-import { Window } from "@tauri-apps/api/window";
-import { invoke } from "@tauri-apps/api/core";
-import { useEffect } from "react";
 
-function App() {
+export function Menubar() {
   async function contextmenu() {
     const response = await invoke("open_context_menu");
     console.log(response);
@@ -80,18 +78,18 @@ function App() {
     ],
 
     right: [
-      {
-        id: "settings",
-        label: (
-          <button
-            onClick={async () => await invoke("open_settings")}
-            className="cursor-default hover:bg-neutral-700/30 rounded-sm mr-1 px-1"
-          >
-            <ToggleMultipleRegular fontSize={18} />
-          </button>
-        ),
-        render: <></>,
-      },
+      // {
+      //   id: "settings",
+      //   label: (
+      //     <button
+      //       onClick={async () => await invoke("open_settings")}
+      //       className="cursor-default hover:bg-neutral-700/30 rounded-sm mr-1 px-1"
+      //     >
+      //       <ToggleMultipleRegular fontSize={18} />
+      //     </button>
+      //   ),
+      //   render: <></>,
+      // },
       {
         id: "clock",
         label: <></>,
@@ -134,5 +132,3 @@ function App() {
     </div>
   );
 }
-
-export default App;

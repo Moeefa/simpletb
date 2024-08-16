@@ -1,21 +1,24 @@
 use std::sync::Mutex;
 
-use active_win_pos_rs::{get_active_window, ActiveWindow};
-use icons::get_icon;
+use active_win_pos_rs::get_active_window;
+use active_win_pos_rs::ActiveWindow;
+
 use lazy_static::lazy_static;
 use regex::Regex;
 use tauri::Emitter;
+
+use icons::get_icon;
+use util::is_cursor_visible;
 use util::ScreenGeometry;
 use util::APP_HANDLE;
-use windows::Win32::{
-  Foundation::HWND,
-  UI::{
-    Accessibility::{SetWinEventHook, HWINEVENTHOOK},
-    WindowsAndMessaging::{
-      EVENT_OBJECT_FOCUS, EVENT_SYSTEM_FOREGROUND, WINEVENT_OUTOFCONTEXT, WINEVENT_SKIPOWNPROCESS,
-    },
-  },
-};
+
+use windows::Win32::Foundation::HWND;
+use windows::Win32::UI::Accessibility::SetWinEventHook;
+use windows::Win32::UI::Accessibility::HWINEVENTHOOK;
+use windows::Win32::UI::WindowsAndMessaging::EVENT_OBJECT_FOCUS;
+use windows::Win32::UI::WindowsAndMessaging::EVENT_SYSTEM_FOREGROUND;
+use windows::Win32::UI::WindowsAndMessaging::WINEVENT_OUTOFCONTEXT;
+use windows::Win32::UI::WindowsAndMessaging::WINEVENT_SKIPOWNPROCESS;
 
 lazy_static! {
   static ref PREV_WINDOW: Mutex<ActiveWindow> = Mutex::new(ActiveWindow::default());
@@ -30,7 +33,7 @@ struct Payload {
 }
 
 // Function to setup event listeners
-pub fn setup_event_listeners() {
+pub fn init() {
   // Hook window focus event
   let _ = unsafe {
     SetWinEventHook(
@@ -83,21 +86,25 @@ unsafe extern "system" fn win_event_hook_callback(
         let screen = ScreenGeometry::new();
         if width == screen.width as f64
           && height == screen.height as f64
+          && !is_cursor_visible()
           && !*IS_FULLSCREEN.lock().unwrap()
         {
+          println!("{} {:?}", active_window.app_name, is_cursor_visible());
           app_handle
             .emit("app-fullscreen", ())
             .expect("Failed to emit app fullscreen");
         } else {
-          app_handle
-            .emit("app-not-fullscreen", ())
-            .expect("Failed to emit app fullscreen");
+          if active_window.app_name != "Windows Explorer" {
+            app_handle
+              .emit("app-not-fullscreen", ())
+              .expect("Failed to emit app fullscreen");
+          }
         }
 
         if active_window.app_name != PREV_WINDOW.lock().unwrap().app_name.as_str()
           && active_window.app_name != env!("CARGO_PKG_DESCRIPTION")
         {
-          let icon = get_icon(&active_window.process_path.to_str().ok_or("").unwrap());
+          let icon = get_icon(&active_window.process_path.to_str().ok_or("").unwrap()).unwrap();
 
           *PREV_WINDOW.lock().unwrap() = active_window.clone();
           app_handle
@@ -105,7 +112,7 @@ unsafe extern "system" fn win_event_hook_callback(
               "active-window",
               Payload {
                 message: active_window.app_name,
-                buffer: icon.expect("Failed to get icon"),
+                buffer: icon,
                 hwnd: active_window_hwnd,
               },
             )

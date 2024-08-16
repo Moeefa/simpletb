@@ -1,0 +1,19 @@
+.widget {
+  @apply flex items-center gap-2;
+}
+
+.widgets {
+  @apply inline-flex items-center space-x-1;
+}
+
+.widgets.left {
+  @apply justify-start w-96;
+}
+
+.widgets.center {
+  @apply justify-center flex-1;
+}
+
+.widgets.right {
+  @apply justify-end w-96;
+}

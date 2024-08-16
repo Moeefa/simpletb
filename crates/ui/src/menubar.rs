@@ -1,3 +1,5 @@
+use std::path::PathBuf;
+
 use tauri::WebviewWindow;
 
 use util::ScreenGeometry;
@@ -31,7 +33,7 @@ fn setup_window() -> Result<tauri::WebviewWindow, ()> {
   let window = tauri::WebviewWindowBuilder::new(
     unsafe { APP_HANDLE.as_ref().unwrap() },
     "menubar",
-    tauri::WebviewUrl::App("/crates/ui/src/displays/menubar/index.html".into()),
+    tauri::WebviewUrl::App(PathBuf::from("/#/menubar")),
   )
   .title("Menubar")
   .transparent(true)
@@ -62,10 +64,7 @@ pub fn init() {
 
     // Set window size using MoveWindow
     let width = ScreenGeometry::new().width;
-    let height = USER_SETTINGS
-      .get("height")
-      .and_then(|v| v.as_i64())
-      .unwrap_or(32) as i32;
+    let height = USER_SETTINGS.height;
     MoveWindow(hwnd, 0, 0, width, height, true).expect("Failed to set window size");
   }
 }
@@ -73,33 +72,30 @@ pub fn init() {
 pub fn create_round_window() -> Result<WebviewWindow, String> {
   // Create a round window
   // ...
-  let window_height = USER_SETTINGS
-    .get("height")
-    .and_then(|v| v.as_i64())
-    .unwrap_or(32) as f64;
+  let window_height = USER_SETTINGS.height;
   let (width, _height) = unsafe { (ScreenGeometry::new().width, ScreenGeometry::new().height) };
 
   let webview_window = tauri::WebviewWindowBuilder::new(
     unsafe { APP_HANDLE.as_ref().unwrap() },
     "round-border",
-    tauri::WebviewUrl::App("/crates/ui/src/displays/menubar/rounded/index.html".into()),
+    tauri::WebviewUrl::App(PathBuf::from("/#/rounded")),
   )
   .title("Round Border")
   .decorations(false)
   .resizable(false)
   .transparent(true)
   .inner_size(width.into(), 20.0)
-  .position(0.0, window_height)
+  .position(0.0, window_height as f64)
   .shadow(false)
   .always_on_top(true)
   .skip_taskbar(true)
   .build()
   .expect("Failed to create window");
 
-  webview_window
-    .clone()
-    .set_ignore_cursor_events(true)
-    .unwrap();
+  // webview_window
+  //   .clone()
+  //   .set_ignore_cursor_events(true)
+  //   .unwrap();
 
   let hwnd: HWND = unsafe { std::mem::transmute(webview_window.hwnd().unwrap().0) };
 
@@ -129,14 +125,7 @@ unsafe fn get_pos(appbar_data: *mut APPBARDATA, height: i32) -> APPBARDATA {
 }
 
 pub unsafe fn add() -> Result<(), &'static str> {
-  let (width, height) = (
-    ScreenGeometry::new().width,
-    USER_SETTINGS
-      .get("height")
-      .unwrap_or(&serde_json::Value::Null)
-      .as_i64()
-      .unwrap_or(32) as i32,
-  );
+  let (width, height) = (ScreenGeometry::new().width, USER_SETTINGS.height);
 
   let default_appbar_data: *mut APPBARDATA = &mut APPBARDATA {
     cbSize: std::mem::size_of::<APPBARDATA>() as u32,

@@ -1,20 +1,18 @@
 mod convert;
 
-use convert::convert_hicon_to_rgba_image;
-
-use image::DynamicImage;
 use image::ImageFormat;
 use image::RgbaImage;
+
 use regex::Regex;
 use util::AppError;
 use walkdir::WalkDir;
 use widestring::U16CString;
-use windows::core::HSTRING;
+
 use windows::core::PCWSTR;
-use windows::Management::Deployment::PackageManager;
 use windows::Win32::UI::Shell::ExtractIconExW;
 use windows::Win32::UI::WindowsAndMessaging::DestroyIcon;
 use windows::Win32::UI::WindowsAndMessaging::HICON;
+
 use xml::reader::XmlEvent;
 use xml::EventReader;
 
@@ -24,8 +22,8 @@ use std::io::BufReader;
 use std::io::Cursor;
 use std::io::Read;
 use std::path::Path;
-use std::path::PathBuf;
 
+use convert::hicon_to_rgba;
 use util::Result as AppResult;
 
 pub fn get_images_from_exe(executable_path: &str) -> AppResult<Vec<RgbaImage>> {
@@ -55,7 +53,7 @@ pub fn get_images_from_exe(executable_path: &str) -> AppResult<Vec<RgbaImage>> {
     let images = large_icons
       .iter()
       .chain(small_icons.iter())
-      .map(convert_hicon_to_rgba_image)
+      .map(hicon_to_rgba)
       .filter_map(|r| match r {
         Ok(img) => Some(img),
         Err(e) => {
@@ -90,11 +88,10 @@ pub fn decode_uri(s: impl AsRef<str>) -> String {
 }
 
 pub fn get_icon(exe_path: &str) -> Result<Vec<u8>, Box<dyn Error>> {
-  let exe_pathbuf = PathBuf::from(exe_path);
   let images = get_images_from_exe(exe_path);
   let mut png_bytes: Vec<u8> = Vec::new();
 
-  let uwp_icon = get_modern_app_logo(exe_path);
+  let uwp_icon = get_uwp_icon(exe_path);
   if let Ok(uwp_icon) = uwp_icon {
     png_bytes = uwp_icon;
   }
@@ -115,7 +112,7 @@ pub fn get_icon(exe_path: &str) -> Result<Vec<u8>, Box<dyn Error>> {
   Ok(png_bytes)
 }
 
-fn get_modern_app_logo(exe_path: &str) -> Result<Vec<u8>, Box<dyn Error>> {
+fn get_uwp_icon(exe_path: &str) -> Result<Vec<u8>, Box<dyn Error>> {
   let dir = Path::new(&exe_path)
     .parent()
     .ok_or("Failed to get parent directory")?;
@@ -213,3 +210,52 @@ fn get_modern_app_logo(exe_path: &str) -> Result<Vec<u8>, Box<dyn Error>> {
   file.read_to_end(&mut buf).unwrap();
   Ok(buf)
 }
+
+// pub fn get_icon_alternative(hwnd: HWND) -> Vec<u8> {
+//   let mut icon = Vec::new();
+//   if let Some(hicon) = get_window_icon(hwnd, WPARAM(ICON_BIG as usize)) {
+//     let bitmap = convert_hicon_to_rgba_image(&hicon);
+//     icon = bitmap.unwrap().to_vec();
+//   }
+
+//   if icon.is_empty() {
+//     if let Some(hicon) = get_window_icon(hwnd, WPARAM(ICON_SMALL as usize)) {
+//       let bitmap = convert_hicon_to_rgba_image(&hicon);
+//       icon = bitmap.unwrap().to_vec();
+//     }
+//   }
+
+//   if icon.is_empty() {
+//     if let Some(hicon) = get_window_icon(hwnd, WPARAM(ICON_SMALL2 as usize)) {
+//       let bitmap = convert_hicon_to_rgba_image(&hicon);
+//       icon = bitmap.unwrap().to_vec();
+//     }
+//   }
+
+//   if icon.is_empty() {
+//     if let Some(hicon) = get_window_class_icon(hwnd, GCLP_HICON.0) {
+//       let bitmap = convert_hicon_to_rgba_image(&hicon);
+//       icon = bitmap.unwrap().to_vec();
+//     }
+//   }
+
+//   icon
+// }
+
+// fn get_window_icon(hwnd: HWND, icon_type: WPARAM) -> Option<HICON> {
+//   let hicon = unsafe { SendMessageW(hwnd, WM_GETICON, icon_type, LPARAM(0)) };
+//   if hicon.0 != 0 {
+//     Some(HICON(hicon.0 as isize))
+//   } else {
+//     None
+//   }
+// }
+
+// fn get_window_class_icon(hwnd: HWND, icon_type: i32) -> Option<HICON> {
+//   let hicon = unsafe { GetClassLongPtrW(hwnd, GET_CLASS_LONG_INDEX(icon_type)) };
+//   if hicon != 0 {
+//     Some(HICON(hicon as isize))
+//   } else {
+//     None
+//   }
+// }

@@ -1,4 +1,6 @@
-use windows::Win32::{Foundation::RECT, UI::WindowsAndMessaging::{GetDesktopWindow, GetWindowRect}};
+use windows::Win32::Foundation::RECT;
+use windows::Win32::UI::WindowsAndMessaging::GetDesktopWindow;
+use windows::Win32::UI::WindowsAndMessaging::GetWindowRect;
 
 pub struct ScreenGeometry {
   pub x: i32,
@@ -7,8 +9,8 @@ pub struct ScreenGeometry {
   pub width: i32,
 }
 
-impl ScreenGeometry {
-  const fn default() -> Self {
+impl Default for ScreenGeometry {
+  fn default() -> Self {
     Self {
       x: 0,
       y: 0,
@@ -16,7 +18,9 @@ impl ScreenGeometry {
       width: 0,
     }
   }
+}
 
+impl ScreenGeometry {
   pub unsafe fn new() -> Self {
     let mut screen_rect = RECT::default();
     let mut geometry: ScreenGeometry = Self::default();
