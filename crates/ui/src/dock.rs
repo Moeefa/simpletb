@@ -173,7 +173,7 @@ pub unsafe fn active_window_event() {
           window
             .set_position(PhysicalPosition {
               x: (screen_rect.width / 2) - ((length * 44 / 2) + 8),
-              y: screen_rect.height - 51 - MARGIN_BOTTOM,
+              y: screen_rect.height - 51 - USER_SETTINGS.margin_bottom,
             })
             .unwrap();
 
@@ -207,7 +207,7 @@ pub unsafe fn active_window_event() {
           window
             .set_position(PhysicalPosition {
               x: (screen_rect.width / 2) - ((length * 44 / 2) + 8),
-              y: screen_rect.height - 51 - MARGIN_BOTTOM,
+              y: screen_rect.height - 51 - USER_SETTINGS.margin_bottom,
             })
             .unwrap();
 
@@ -244,7 +244,7 @@ pub unsafe fn active_window_event() {
           window
             .set_position(PhysicalPosition {
               x: (screen_rect.width / 2) - ((length * 44 / 2) + 8),
-              y: screen_rect.height - 51 - MARGIN_BOTTOM,
+              y: screen_rect.height - 51 - USER_SETTINGS.margin_bottom,
             })
             .unwrap();
 
@@ -292,7 +292,7 @@ pub unsafe fn active_window_event() {
               window
                 .set_position(PhysicalPosition {
                   x: (screen_rect.width / 2) - ((length * 44 / 2) + 8),
-                  y: screen_rect.height - 51 - MARGIN_BOTTOM,
+                  y: screen_rect.height - 51 - USER_SETTINGS.margin_bottom,
                 })
                 .unwrap();
 
@@ -364,7 +364,7 @@ pub unsafe fn enum_opened_windows(window: tauri::WebviewWindow) {
       cloned_window
         .set_position(PhysicalPosition {
           x: (screen_rect.width / 2) - ((length * 44 / 2) + 8),
-          y: screen_rect.height - 51 - MARGIN_BOTTOM,
+          y: screen_rect.height - 51 - USER_SETTINGS.margin_bottom,
         })
         .unwrap();
 

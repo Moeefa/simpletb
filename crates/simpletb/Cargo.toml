@@ -30,10 +30,6 @@ tauri.workspace = true
 tauri-plugin-shell.workspace = true
 tauri-plugin-http.workspace = true
 tauri-plugin-process.workspace = true
-log.workspace = true
-simple_logger.workspace = true
 
 [build-dependencies]
 tauri-build = { version = "2.0.0-beta", features = [] }
-log.workspace = true
-simple_logger.workspace = true

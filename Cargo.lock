@@ -527,16 +527,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3d7b894f5411737b7867f4827955924d7c254fc9f4d91a6aad6b097804b1018b"
 
 [[package]]
-name = "colored"
-version = "2.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "cbf2150cce219b664a8a70df7a1f933836724b503f8a413af9365b4dcc4d90b8"
-dependencies = [
- "lazy_static",
- "windows-sys 0.48.0",
-]
-
-[[package]]
 name = "combine"
 version = "4.6.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3656,17 +3646,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "simple_logger"
-version = "5.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e8c5dfa5e08767553704aa0ffd9d9794d527103c736aba9854773851fd7497eb"
-dependencies = [
- "colored",
- "log",
- "windows-sys 0.48.0",
-]
-
-[[package]]
 name = "simpletb"
 version = "0.1.0"
 dependencies = [
@@ -3674,11 +3653,9 @@ dependencies = [
  "backdrop",
  "icons",
  "lazy_static",
- "log",
  "regex",
  "serde",
  "serde_json",
- "simple_logger",
  "tauri",
  "tauri-build",
  "tauri-plugin-http",

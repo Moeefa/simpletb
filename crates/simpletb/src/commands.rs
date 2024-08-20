@@ -4,7 +4,7 @@ use tauri::{
   window::{Effect, EffectsBuilder},
   Manager,
 };
-use util::{ScreenGeometry, MARGIN_BOTTOM};
+use util::{ScreenGeometry, USER_SETTINGS};
 
 use windows::core::PCSTR;
 use windows::core::PSTR;
@@ -93,7 +93,7 @@ pub async fn open_context(app: tauri::AppHandle, _x: i32, _y: i32) {
       MoveWindow(
         hwnd,
         (screen.width / 2) - (220 / 2),
-        screen.height - 51 - MARGIN_BOTTOM - 120,
+        screen.height - 51 - USER_SETTINGS.margin_bottom - 120,
         220,
         120,
         true,

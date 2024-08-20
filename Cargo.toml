@@ -31,10 +31,8 @@ active-win-pos-rs = "0.8"
 image = "0.25.1"
 regex = "1.10.4"
 widestring = "1.1.0"
-itertools = "0.12.1"
 tokio = "1.37.0"
 lazy_static = "1.4.0"
-log = "0.4.22"
 xml = "0.8.20"
 walkdir = "2"
 
@@ -63,8 +61,3 @@ features = [
   "Foundation_Collections",
   "Management_Deployment_Preview",
 ]
-
-[workspace.dependencies.simple_logger]
-version = "5.0.0"
-default-features = false
-features = ["colors"]

@@ -1,11 +1,13 @@
 use lazy_static::lazy_static;
 use serde::Deserialize;
-use std::env;
 use std::fs;
+
+use crate::home_dir;
 
 #[derive(Deserialize)]
 pub struct Settings {
   pub height: i32,
+  pub margin_bottom: i32,
 }
 
 lazy_static! {
@@ -14,7 +16,10 @@ lazy_static! {
 
 impl Default for Settings {
   fn default() -> Self {
-    Self { height: 26 }
+    Self {
+      height: 26,
+      margin_bottom: 5,
+    }
   }
 }
 
@@ -27,7 +32,7 @@ impl Settings {
   pub fn load_settings() -> Result<Self, Box<dyn std::error::Error>> {
     let file = fs::File::open(format!(
       "{}\\.simpletb\\config.json",
-      env::var("HOME").unwrap_or_default()
+      home_dir().unwrap_or_default().display()
     ))?;
 
     let config: Settings = serde_json::from_reader(file)?;
