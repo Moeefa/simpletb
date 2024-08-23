@@ -3652,7 +3652,6 @@ dependencies = [
  "active-win-pos-rs",
  "backdrop",
  "icons",
- "lazy_static",
  "regex",
  "serde",
  "serde_json",
@@ -4573,7 +4572,6 @@ version = "0.1.0"
 dependencies = [
  "backdrop",
  "icons",
- "lazy_static",
  "serde",
  "serde_json",
  "tauri",
@@ -4690,7 +4688,6 @@ checksum = "09cc8ee72d2a9becf2f2febe0205bbed8fc6615b7cb429ad062dc7b7ddd036a9"
 name = "util"
 version = "0.1.0"
 dependencies = [
- "lazy_static",
  "serde",
  "serde_json",
  "tauri",

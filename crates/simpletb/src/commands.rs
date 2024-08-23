@@ -29,7 +29,7 @@ use windows::Win32::UI::WindowsAndMessaging::WINDOWPLACEMENT;
 #[tauri::command]
 pub fn show_window(hwnd: isize) {
   unsafe {
-    let hwnd: HWND = std::mem::transmute(hwnd);
+    let hwnd: HWND = HWND(hwnd);
     let mut placement: WINDOWPLACEMENT = WINDOWPLACEMENT::default();
     GetWindowPlacement(hwnd, &mut placement).expect("Failed to get window placement");
     if placement.showCmd == 2 {
@@ -71,7 +71,7 @@ pub async fn open_context(app: tauri::AppHandle, _x: i32, _y: i32) {
     window.close().unwrap();
   }
 
-  let screen = unsafe { ScreenGeometry::new() };
+  let screen = ScreenGeometry::new();
 
   let window = tauri::WebviewWindowBuilder::new(
     &app,
@@ -88,7 +88,7 @@ pub async fn open_context(app: tauri::AppHandle, _x: i32, _y: i32) {
   .expect("Failed to create context window");
 
   unsafe {
-    let hwnd: HWND = std::mem::transmute(window.hwnd().unwrap().0);
+    let hwnd: HWND = HWND(window.hwnd().unwrap().0);
     thread::spawn(move || {
       MoveWindow(
         hwnd,

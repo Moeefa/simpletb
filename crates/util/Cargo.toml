@@ -14,7 +14,6 @@ path = "src/util.rs"
 [dependencies]
 tauri-plugin-shell.workspace = true
 tauri.workspace = true
-lazy_static.workspace = true
 serde_json.workspace = true
 serde.workspace = true
 windows.workspace = true

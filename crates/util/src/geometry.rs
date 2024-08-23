@@ -21,11 +21,11 @@ impl Default for ScreenGeometry {
 }
 
 impl ScreenGeometry {
-  pub unsafe fn new() -> Self {
+  pub fn new() -> Self {
     let mut screen_rect = RECT::default();
     let mut geometry: ScreenGeometry = Self::default();
 
-    GetWindowRect(GetDesktopWindow(), &mut screen_rect).unwrap();
+    unsafe { GetWindowRect(GetDesktopWindow(), &mut screen_rect).unwrap() };
     geometry.x = screen_rect.left;
     geometry.y = screen_rect.top;
     geometry.width = screen_rect.right;

@@ -1,6 +1,5 @@
-use lazy_static::lazy_static;
 use serde::Deserialize;
-use std::fs;
+use std::{fs, sync::LazyLock};
 
 use crate::home_dir;
 
@@ -10,9 +9,8 @@ pub struct Settings {
   pub margin_bottom: i32,
 }
 
-lazy_static! {
-  pub static ref USER_SETTINGS: Settings = Settings::new();
-}
+pub static USER_SETTINGS: LazyLock<Settings> =
+  LazyLock::new(|| Settings::load_settings().unwrap_or_default());
 
 impl Default for Settings {
   fn default() -> Self {
@@ -25,8 +23,7 @@ impl Default for Settings {
 
 impl Settings {
   pub fn new() -> Self {
-    let settings = Settings::load_settings().unwrap_or_default();
-    settings
+    Settings::load_settings().unwrap_or_default()
   }
 
   pub fn load_settings() -> Result<Self, Box<dyn std::error::Error>> {

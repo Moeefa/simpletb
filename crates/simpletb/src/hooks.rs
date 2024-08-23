@@ -1,10 +1,11 @@
+use std::sync::LazyLock;
 use std::sync::Mutex;
 
 use active_win_pos_rs::get_active_window;
 use active_win_pos_rs::ActiveWindow;
 
-use lazy_static::lazy_static;
 use regex::Regex;
+
 use tauri::Emitter;
 
 use icons::get_icon;
@@ -20,10 +21,9 @@ use windows::Win32::UI::WindowsAndMessaging::EVENT_SYSTEM_FOREGROUND;
 use windows::Win32::UI::WindowsAndMessaging::WINEVENT_OUTOFCONTEXT;
 use windows::Win32::UI::WindowsAndMessaging::WINEVENT_SKIPOWNPROCESS;
 
-lazy_static! {
-  static ref PREV_WINDOW: Mutex<ActiveWindow> = Mutex::new(ActiveWindow::default());
-  static ref IS_FULLSCREEN: Mutex<bool> = Mutex::new(false);
-}
+static PREV_WINDOW: LazyLock<Mutex<ActiveWindow>> =
+  LazyLock::new(|| Mutex::new(ActiveWindow::default()));
+static IS_FULLSCREEN: LazyLock<Mutex<bool>> = LazyLock::new(|| Mutex::new(false));
 
 #[derive(Clone, serde::Serialize)]
 struct Payload {
@@ -70,7 +70,10 @@ unsafe extern "system" fn win_event_hook_callback(
   _thread_id: u32,
   _timestamp: u32,
 ) {
-  let app_handle = APP_HANDLE.as_ref().unwrap();
+  let binding = APP_HANDLE.lock().unwrap();
+  let app_handle = binding.as_ref().unwrap_or_else(|| {
+    panic!("Failed to get app handle");
+  });
 
   match _event_id {
     EVENT_OBJECT_FOCUS | EVENT_SYSTEM_FOREGROUND => match get_active_window() {

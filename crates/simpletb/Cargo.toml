@@ -22,7 +22,6 @@ serde.workspace = true
 serde_json.workspace = true
 tokio.workspace = true
 windows.workspace = true
-lazy_static.workspace = true
 active-win-pos-rs.workspace = true
 regex.workspace = true
 

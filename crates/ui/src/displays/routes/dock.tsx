@@ -17,21 +17,14 @@ export function Dock() {
   const isJustReordered = useRef(false);
 
   useEffect(() => {
-    listen<App[]>("set-apps", (event) => {
-      console.log(event.payload);
-      setApps(event.payload);
-    });
+    listen<App[]>("set-apps", (event) => setApps(event.payload));
 
     listen<{ message: string; buffer: number[]; hwnd: number }>(
       "active-window",
-      (event) => {
-        console.log(event.payload);
-        if (typeof event.payload === "number") {
-          setActive(event.payload);
-        } else {
-          setActive(event.payload.hwnd);
-        }
-      },
+      (event) =>
+        typeof event.payload === "number"
+          ? setActive(event.payload)
+          : setActive(event.payload.hwnd),
     );
 
     listen("hover-hitbox", () => {

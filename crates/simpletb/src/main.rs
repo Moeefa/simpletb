@@ -43,7 +43,7 @@ fn setup_tauri_app(app_builder: tauri::Builder<tauri::Wry>) -> tauri::Builder<ta
   app_builder
     .setup(move |app| {
       // Initialize app handle
-      unsafe { APP_HANDLE = Some(app.handle().clone()) };
+      *APP_HANDLE.lock().unwrap() = Some(app.handle().clone());
 
       hooks::init();
       ui::init();

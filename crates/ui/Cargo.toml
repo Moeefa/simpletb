@@ -18,6 +18,5 @@ icons.workspace = true
 
 serde.workspace = true
 serde_json.workspace = true
-lazy_static.workspace = true
 tauri.workspace = true
 windows.workspace = true

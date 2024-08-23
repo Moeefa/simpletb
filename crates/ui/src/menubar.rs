@@ -1,4 +1,6 @@
 use std::path::PathBuf;
+use std::sync::LazyLock;
+use std::sync::Mutex;
 
 use tauri::WebviewWindow;
 
@@ -27,11 +29,13 @@ use windows::Win32::UI::WindowsAndMessaging::GWL_EXSTYLE;
 use windows::Win32::UI::WindowsAndMessaging::USER_DEFAULT_SCREEN_DPI;
 use windows::Win32::UI::WindowsAndMessaging::WS_EX_TOOLWINDOW;
 
-static mut WINDOW_HWND: HWND = unsafe { std::mem::transmute(std::ptr::null_mut::<HWND>()) };
+static WINDOW_HWND: LazyLock<Mutex<HWND>> = LazyLock::new(|| Mutex::new(HWND::default()));
 
 fn setup_window() -> Result<tauri::WebviewWindow, ()> {
   let window = tauri::WebviewWindowBuilder::new(
-    unsafe { APP_HANDLE.as_ref().unwrap() },
+    APP_HANDLE.lock().unwrap().as_ref().unwrap_or_else(|| {
+      panic!("Failed to get app handle");
+    }),
     "menubar",
     tauri::WebviewUrl::App(PathBuf::from("/#/menubar")),
   )
@@ -54,8 +58,8 @@ fn setup_window() -> Result<tauri::WebviewWindow, ()> {
 
 pub fn init() {
   let window = setup_window().unwrap();
-  let hwnd: HWND = unsafe { std::mem::transmute(window.hwnd().unwrap().0) };
-  unsafe { WINDOW_HWND = hwnd };
+  let hwnd: HWND = HWND(window.hwnd().unwrap().0);
+  *WINDOW_HWND.lock().unwrap() = hwnd;
 
   unsafe {
     add().expect("Failed to add app bar");
@@ -73,10 +77,12 @@ pub fn create_round_window() -> Result<WebviewWindow, String> {
   // Create a round window
   // ...
   let window_height = USER_SETTINGS.height;
-  let (width, _height) = unsafe { (ScreenGeometry::new().width, ScreenGeometry::new().height) };
+  let (width, _height) = (ScreenGeometry::new().width, ScreenGeometry::new().height);
 
   let webview_window = tauri::WebviewWindowBuilder::new(
-    unsafe { APP_HANDLE.as_ref().unwrap() },
+    APP_HANDLE.lock().unwrap().as_ref().unwrap_or_else(|| {
+      panic!("Failed to get app handle");
+    }),
     "round-border",
     tauri::WebviewUrl::App(PathBuf::from("/#/rounded")),
   )
@@ -97,7 +103,7 @@ pub fn create_round_window() -> Result<WebviewWindow, String> {
     .set_ignore_cursor_events(true)
     .unwrap();
 
-  let hwnd: HWND = unsafe { std::mem::transmute(webview_window.hwnd().unwrap().0) };
+  let hwnd: HWND = HWND(webview_window.hwnd().unwrap().0);
 
   unsafe {
     SetMenu(hwnd, None).unwrap();
@@ -110,7 +116,8 @@ pub fn create_round_window() -> Result<WebviewWindow, String> {
 unsafe fn get_pos(appbar_data: *mut APPBARDATA, height: i32) -> APPBARDATA {
   let geometry = ScreenGeometry::new();
 
-  let dpi = GetDpiForWindow::<HWND>(WINDOW_HWND);
+  let hwnd = *WINDOW_HWND.lock().unwrap();
+  let dpi = GetDpiForWindow::<HWND>(hwnd);
   let device_pixel_ratio = dpi as f64 / USER_DEFAULT_SCREEN_DPI as f64;
   let bar_height = height * (device_pixel_ratio as i32);
 
@@ -125,11 +132,12 @@ unsafe fn get_pos(appbar_data: *mut APPBARDATA, height: i32) -> APPBARDATA {
 }
 
 pub unsafe fn add() -> Result<(), &'static str> {
+  let hwnd = *WINDOW_HWND.lock().unwrap();
   let (width, height) = (ScreenGeometry::new().width, USER_SETTINGS.height);
 
   let default_appbar_data: *mut APPBARDATA = &mut APPBARDATA {
     cbSize: std::mem::size_of::<APPBARDATA>() as u32,
-    hWnd: WINDOW_HWND,
+    hWnd: hwnd,
     uEdge: ABE_TOP,
     rc: RECT::default(),
     lParam: LPARAM(0),
@@ -148,10 +156,10 @@ pub unsafe fn add() -> Result<(), &'static str> {
 
     SHAppBarMessage(ABM_QUERYPOS, &mut taskbar_pos as *mut APPBARDATA);
     SHAppBarMessage(ABM_SETPOS, &mut taskbar_pos as *mut APPBARDATA);
-    MoveWindow(WINDOW_HWND, 0, 0, width, height, BOOL::from(true)).expect("Failed to move window");
+    MoveWindow(hwnd, 0, 0, width, height, BOOL::from(true)).expect("Failed to move window");
   } else {
     SHAppBarMessage(ABM_SETPOS, &mut taskbar_pos as *mut APPBARDATA);
-    MoveWindow(WINDOW_HWND, 0, 0, width, height, BOOL::from(true)).expect("Failed to move window");
+    MoveWindow(hwnd, 0, 0, width, height, BOOL::from(true)).expect("Failed to move window");
   }
 
   create_round_window().unwrap();
@@ -159,15 +167,16 @@ pub unsafe fn add() -> Result<(), &'static str> {
   Ok(())
 }
 
-pub unsafe fn remove() {
+pub fn remove() {
+  let hwnd = *WINDOW_HWND.lock().unwrap();
   let mut default_appbar_data = APPBARDATA {
     cbSize: std::mem::size_of::<APPBARDATA>() as u32,
-    hWnd: WINDOW_HWND,
+    hWnd: hwnd,
     uCallbackMessage: 0,
     uEdge: ABE_TOP,
     rc: RECT::default(),
     lParam: LPARAM(0),
   };
 
-  SHAppBarMessage(ABM_REMOVE, &mut default_appbar_data as *mut APPBARDATA);
+  unsafe { SHAppBarMessage(ABM_REMOVE, &mut default_appbar_data as *mut APPBARDATA) };
 }

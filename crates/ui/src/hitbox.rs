@@ -12,11 +12,10 @@ use windows::Win32::UI::WindowsAndMessaging::MoveWindow;
 
 pub fn init() {
   let window = setup_window().expect("Failed to setup dock window");
-  let hwnd: HWND = unsafe { std::mem::transmute(window.hwnd().unwrap().0) };
+  let hwnd: HWND = HWND(window.hwnd().unwrap().0);
+  let screen_rect = ScreenGeometry::new();
 
   unsafe {
-    let screen_rect = ScreenGeometry::new();
-    // SetWindowPos(hwnd, HWND_TOPMOST, 0, screen_rect.height, screen_rect.width, 2, SWP_NOSIZE | SWP_NOMOVE).expect("Failed to set window position");
     MoveWindow(hwnd, 0, screen_rect.height - 2, screen_rect.width, 2, true)
       .expect("Failed to move window");
   }
@@ -32,7 +31,9 @@ pub fn init() {
 
 pub fn setup_window() -> Result<tauri::WebviewWindow, ()> {
   let window = tauri::WebviewWindowBuilder::new(
-    unsafe { APP_HANDLE.as_ref().unwrap() },
+    APP_HANDLE.lock().unwrap().as_ref().unwrap_or_else(|| {
+      panic!("Failed to get app handle");
+    }),
     "hitbox",
     tauri::WebviewUrl::App(PathBuf::from("/#/hitbox")),
   )

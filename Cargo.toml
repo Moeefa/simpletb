@@ -32,7 +32,6 @@ image = "0.25.1"
 regex = "1.10.4"
 widestring = "1.1.0"
 tokio = "1.37.0"
-lazy_static = "1.4.0"
 xml = "0.8.20"
 walkdir = "2"
 
