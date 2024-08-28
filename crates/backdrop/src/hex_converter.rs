@@ -1,4 +1,4 @@
-pub fn hex_to_rgba_int(hex: &str) -> Option<u32> {
+pub fn hex_to_rgba_int(hex: String) -> Option<u32> {
   if hex.len() == 9 && hex.starts_with('#') {
     let r = &hex[1..3];
     let g = &hex[3..5];

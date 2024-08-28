@@ -31,7 +31,7 @@ type SetWindowCompositionAttributeFn =
 //
 // https://learn.microsoft.com/en-us/windows/win32/api/dwmapi/ne-dwmapi-dwm_systembackdrop_type
 
-pub fn enable_blur(hwnd: HWND, hex: &str, always_active: bool) {
+pub fn enable_blur(hwnd: HWND, hex: &String, always_active: bool) {
   if !always_active {
     unsafe {
       // Set system backdrop
@@ -50,7 +50,7 @@ pub fn enable_blur(hwnd: HWND, hex: &str, always_active: bool) {
     let accent = ACCENT_POLICY {
       nAccentState: ACCENT_ENABLE_ACRYLICBLURBEHIND,
       nFlags: 2,
-      nGradientColor: hex_to_rgba_int(hex).unwrap() as i32,
+      nGradientColor: hex_to_rgba_int(hex.to_owned()).unwrap() as i32,
       nAnimationId: 0,
     };
 

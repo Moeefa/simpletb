@@ -2,14 +2,21 @@ use std::path::PathBuf;
 use std::sync::LazyLock;
 use std::sync::Mutex;
 
+use backdrop::enable_blur;
 use tauri::WebviewWindow;
 
 use util::ScreenGeometry;
 use util::APP_HANDLE;
 use util::USER_SETTINGS;
+
 use windows::Win32::Foundation::BOOL;
+use windows::Win32::Foundation::COLORREF;
+use windows::Win32::Graphics::Gdi::CreateSolidBrush;
+use windows::Win32::Graphics::Gdi::FillRect;
+use windows::Win32::Graphics::Gdi::HDC;
 use windows::Win32::UI::HiDpi::GetDpiForWindow;
 use windows::Win32::UI::Shell::SHAppBarMessage;
+use windows::Win32::UI::WindowsAndMessaging::GetClientRect;
 use windows::Win32::UI::WindowsAndMessaging::MoveWindow;
 
 use windows::Win32::Foundation::HWND;
@@ -40,7 +47,7 @@ fn setup_window() -> Result<tauri::WebviewWindow, ()> {
     tauri::WebviewUrl::App(PathBuf::from("/#/menubar")),
   )
   .title("Menubar")
-  .transparent(true)
+  .transparent(USER_SETTINGS.menubar.blur)
   .always_on_top(true)
   .decorations(false)
   .shadow(false)
@@ -60,6 +67,19 @@ pub fn init() {
   let window = setup_window().unwrap();
   let hwnd: HWND = HWND(window.hwnd().unwrap().0);
   *WINDOW_HWND.lock().unwrap() = hwnd;
+
+  if USER_SETTINGS.menubar.blur {
+    enable_blur(hwnd, &USER_SETTINGS.menubar.color, true);
+  } else {
+    unsafe {
+      let brush = CreateSolidBrush(COLORREF(0x000000));
+      let rect: *mut RECT = &mut RECT::default();
+      let hdc = HDC::default();
+
+      GetClientRect(hwnd, rect).unwrap();
+      FillRect(hdc, rect, brush);
+    }
+  }
 
   unsafe {
     add().expect("Failed to add app bar");
@@ -162,7 +182,13 @@ pub unsafe fn add() -> Result<(), &'static str> {
     MoveWindow(hwnd, 0, 0, width, height, BOOL::from(true)).expect("Failed to move window");
   }
 
-  create_round_window().unwrap();
+  if USER_SETTINGS.menubar.round_corners {
+    create_round_window().unwrap();
+
+    if USER_SETTINGS.menubar.blur {
+      println!("Blur with round corners is not supported, the cornes will have no blur effect.");
+    }
+  }
 
   Ok(())
 }

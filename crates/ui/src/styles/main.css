@@ -16,18 +16,29 @@
   #root {
     @apply overflow-hidden h-full;
   }
+
+  :root {
+    --background: #1a1a1a;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #f0f0f0;
+  }
 }
 
 .main-container {
-  @apply flex justify-between px-4 h-full select-none text-white bg-black border-black;
+  @apply flex justify-between px-4 h-full select-none text-white border-black bg-background;
 }
 
 .inverted-border-radius {
   position: relative;
   height: 0px;
   width: 100%;
-  background-color: black;
   border-radius: 0;
+
+  @apply bg-background;
 }
 
 .inverted-border-radius::before {
@@ -41,6 +52,8 @@
   width: 10px;
   border-top-left-radius: 10px;
   box-shadow: 0 -10px 0 0 black;
+
+  @apply shadow-background;
 }
 
 .inverted-border-radius::after {
@@ -53,5 +66,7 @@
   height: 20px;
   width: 10px;
   border-top-right-radius: 10px;
-  box-shadow: 0 -10px 0 0 black;
+  box-shadow: 0 -10px 0 0;
+
+  @apply shadow-background;
 }
