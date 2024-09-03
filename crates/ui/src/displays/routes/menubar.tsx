@@ -1,4 +1,3 @@
-import { invoke } from "@tauri-apps/api/core";
 import { Window } from "@tauri-apps/api/window";
 import { useEffect } from "react";
 import ExecuteButton from "../../components/ui/execute-button";
@@ -6,10 +5,7 @@ import ActiveWindow from "../../components/widgets/active-window";
 import Clock from "../../components/widgets/clock";
 
 export function Menubar() {
-  async function contextmenu() {
-    const response = await invoke("open_context_menu");
-    console.log(response);
-  }
+  const params = new URLSearchParams(window.location.search);
 
   async function fetchSize() {
     const window = Window.getCurrent();
@@ -19,10 +15,6 @@ export function Menubar() {
 
   useEffect(() => {
     fetchSize();
-
-    document.querySelector("body")?.addEventListener("click", () => {
-      contextmenu();
-    });
   }, []);
 
   const widgets = {
@@ -99,7 +91,13 @@ export function Menubar() {
   };
 
   return (
-    <div className="main-container">
+    <div
+      className="main-container"
+      style={{
+        backgroundColor:
+          params.get("blur") === "true" ? "transparent" : "var(--background)",
+      }}
+    >
       <div className="widgets left">
         {widgets.left.map((widget) => (
           <div key={widget.id} className="widget">

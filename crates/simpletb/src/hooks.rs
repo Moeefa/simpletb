@@ -71,9 +71,9 @@ unsafe extern "system" fn win_event_hook_callback(
   _timestamp: u32,
 ) {
   let binding = APP_HANDLE.lock().unwrap();
-  let app_handle = binding.as_ref().unwrap_or_else(|| {
-    panic!("Failed to get app handle");
-  });
+  let app_handle = binding
+    .as_ref()
+    .unwrap_or_else(|| panic!("Failed to get app handle"));
 
   match _event_id {
     EVENT_OBJECT_FOCUS | EVENT_SYSTEM_FOREGROUND => match get_active_window() {

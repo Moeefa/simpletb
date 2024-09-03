@@ -18,7 +18,7 @@
   }
 
   :root {
-    --background: #1a1a1a;
+    --background: #000000;
   }
 }
 
@@ -51,7 +51,7 @@
   height: 20px;
   width: 10px;
   border-top-left-radius: 10px;
-  box-shadow: 0 -10px 0 0 black;
+  box-shadow: 0 -10px 0 0 var(--background);
 
   @apply shadow-background;
 }
@@ -66,7 +66,7 @@
   height: 20px;
   width: 10px;
   border-top-right-radius: 10px;
-  box-shadow: 0 -10px 0 0;
+  box-shadow: 0 -10px 0 0 var(--background);
 
   @apply shadow-background;
 }

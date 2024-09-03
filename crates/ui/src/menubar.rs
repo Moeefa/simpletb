@@ -3,6 +3,7 @@ use std::sync::LazyLock;
 use std::sync::Mutex;
 
 use backdrop::enable_blur;
+use serde::de::IntoDeserializer;
 use tauri::WebviewWindow;
 
 use util::ScreenGeometry;
@@ -10,13 +11,8 @@ use util::APP_HANDLE;
 use util::USER_SETTINGS;
 
 use windows::Win32::Foundation::BOOL;
-use windows::Win32::Foundation::COLORREF;
-use windows::Win32::Graphics::Gdi::CreateSolidBrush;
-use windows::Win32::Graphics::Gdi::FillRect;
-use windows::Win32::Graphics::Gdi::HDC;
 use windows::Win32::UI::HiDpi::GetDpiForWindow;
 use windows::Win32::UI::Shell::SHAppBarMessage;
-use windows::Win32::UI::WindowsAndMessaging::GetClientRect;
 use windows::Win32::UI::WindowsAndMessaging::MoveWindow;
 
 use windows::Win32::Foundation::HWND;
@@ -38,13 +34,32 @@ use windows::Win32::UI::WindowsAndMessaging::WS_EX_TOOLWINDOW;
 
 static WINDOW_HWND: LazyLock<Mutex<HWND>> = LazyLock::new(|| Mutex::new(HWND::default()));
 
+pub fn init() {
+  let window = setup_window().unwrap();
+  let hwnd = HWND(window.hwnd().unwrap().0);
+  *WINDOW_HWND.lock().unwrap() = hwnd;
+
+  unsafe {
+    add().expect("Failed to add app bar");
+
+    SetWindowLongPtrA(hwnd, GWL_EXSTYLE, WS_EX_TOOLWINDOW.0 as isize);
+
+    // Set window size using MoveWindow
+    let width = ScreenGeometry::new().width;
+    let height = USER_SETTINGS.height;
+    MoveWindow(hwnd, 0, 0, width, height, true).expect("Failed to set window size");
+  }
+}
+
 fn setup_window() -> Result<tauri::WebviewWindow, ()> {
   let window = tauri::WebviewWindowBuilder::new(
-    APP_HANDLE.lock().unwrap().as_ref().unwrap_or_else(|| {
-      panic!("Failed to get app handle");
-    }),
+    APP_HANDLE
+      .lock()
+      .unwrap()
+      .as_ref()
+      .unwrap_or_else(|| panic!("Failed to get app handle")),
     "menubar",
-    tauri::WebviewUrl::App(PathBuf::from("/#/menubar")),
+    tauri::WebviewUrl::App(PathBuf::from("/#/menubar?blur=false")),
   )
   .title("Menubar")
   .transparent(USER_SETTINGS.menubar.blur)
@@ -63,36 +78,6 @@ fn setup_window() -> Result<tauri::WebviewWindow, ()> {
   Ok(window)
 }
 
-pub fn init() {
-  let window = setup_window().unwrap();
-  let hwnd: HWND = HWND(window.hwnd().unwrap().0);
-  *WINDOW_HWND.lock().unwrap() = hwnd;
-
-  if USER_SETTINGS.menubar.blur {
-    enable_blur(hwnd, &USER_SETTINGS.menubar.color, true);
-  } else {
-    unsafe {
-      let brush = CreateSolidBrush(COLORREF(0x000000));
-      let rect: *mut RECT = &mut RECT::default();
-      let hdc = HDC::default();
-
-      GetClientRect(hwnd, rect).unwrap();
-      FillRect(hdc, rect, brush);
-    }
-  }
-
-  unsafe {
-    add().expect("Failed to add app bar");
-
-    SetWindowLongPtrA(hwnd, GWL_EXSTYLE, WS_EX_TOOLWINDOW.0 as isize);
-
-    // Set window size using MoveWindow
-    let width = ScreenGeometry::new().width;
-    let height = USER_SETTINGS.height;
-    MoveWindow(hwnd, 0, 0, width, height, true).expect("Failed to set window size");
-  }
-}
-
 pub fn create_round_window() -> Result<WebviewWindow, String> {
   // Create a round window
   // ...
@@ -100,9 +85,11 @@ pub fn create_round_window() -> Result<WebviewWindow, String> {
   let (width, _height) = (ScreenGeometry::new().width, ScreenGeometry::new().height);
 
   let webview_window = tauri::WebviewWindowBuilder::new(
-    APP_HANDLE.lock().unwrap().as_ref().unwrap_or_else(|| {
-      panic!("Failed to get app handle");
-    }),
+    APP_HANDLE
+      .lock()
+      .unwrap()
+      .as_ref()
+      .unwrap_or_else(|| panic!("Failed to get app handle")),
     "round-border",
     tauri::WebviewUrl::App(PathBuf::from("/#/rounded")),
   )
@@ -123,7 +110,7 @@ pub fn create_round_window() -> Result<WebviewWindow, String> {
     .set_ignore_cursor_events(true)
     .unwrap();
 
-  let hwnd: HWND = HWND(webview_window.hwnd().unwrap().0);
+  let hwnd = HWND(webview_window.hwnd().unwrap().0);
 
   unsafe {
     SetMenu(hwnd, None).unwrap();
@@ -184,10 +171,12 @@ pub unsafe fn add() -> Result<(), &'static str> {
 
   if USER_SETTINGS.menubar.round_corners {
     create_round_window().unwrap();
+  } else if USER_SETTINGS.menubar.blur {
+    enable_blur(hwnd, &USER_SETTINGS.menubar.color, true);
+  }
 
-    if USER_SETTINGS.menubar.blur {
-      println!("Blur with round corners is not supported, the cornes will have no blur effect.");
-    }
+  if USER_SETTINGS.menubar.round_corners && USER_SETTINGS.menubar.blur {
+    println!("Blur with round corners is not supported, the cornes will have no blur effect.");
   }
 
   Ok(())

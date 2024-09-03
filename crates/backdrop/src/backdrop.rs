@@ -31,18 +31,18 @@ type SetWindowCompositionAttributeFn =
 //
 // https://learn.microsoft.com/en-us/windows/win32/api/dwmapi/ne-dwmapi-dwm_systembackdrop_type
 
-pub fn enable_blur(hwnd: HWND, hex: &String, always_active: bool) {
+pub fn enable_blur<S: Into<String>>(hwnd: HWND, hex: S, always_active: bool) {
   if !always_active {
+    // Set system backdrop
     unsafe {
-      // Set system backdrop
       DwmSetWindowAttribute(
         hwnd,
         DWMWA_SYSTEMBACKDROP_TYPE,
         &DWMSBT_MAINWINDOW as *const _ as _,
         std::mem::size_of::<DWMWINDOWATTRIBUTE>() as _,
       )
-      .expect("Failed to set window attribute");
-    }
+      .expect("Failed to set window attribute")
+    };
   } else {
     // Always active backdrop
 
@@ -50,7 +50,7 @@ pub fn enable_blur(hwnd: HWND, hex: &String, always_active: bool) {
     let accent = ACCENT_POLICY {
       nAccentState: ACCENT_ENABLE_ACRYLICBLURBEHIND,
       nFlags: 2,
-      nGradientColor: hex_to_rgba_int(hex.to_owned()).unwrap() as i32,
+      nGradientColor: hex_to_rgba_int(hex.into()).unwrap() as i32,
       nAnimationId: 0,
     };
 
@@ -61,13 +61,13 @@ pub fn enable_blur(hwnd: HWND, hex: &String, always_active: bool) {
       cbData: mem::size_of::<ACCENT_POLICY>(),
     };
 
-    #[allow(non_snake_case)]
     unsafe {
       // Load user32.dll
       let hmodule = LoadLibraryA(PCSTR("user32.dll\0".as_ptr() as *const u8))
         .expect("Failed to load user32.dll");
 
       // Get SetWindowCompositionAttribute address
+      #[allow(non_snake_case)]
       let SetWindowCompositionAttribute: SetWindowCompositionAttributeFn = std::mem::transmute(
         GetProcAddress(
           hmodule,

@@ -12,7 +12,7 @@ use windows::Win32::UI::WindowsAndMessaging::MoveWindow;
 
 pub fn init() {
   let window = setup_window().expect("Failed to setup dock window");
-  let hwnd: HWND = HWND(window.hwnd().unwrap().0);
+  let hwnd = HWND(window.hwnd().unwrap().0);
   let screen_rect = ScreenGeometry::new();
 
   unsafe {
@@ -31,9 +31,11 @@ pub fn init() {
 
 pub fn setup_window() -> Result<tauri::WebviewWindow, ()> {
   let window = tauri::WebviewWindowBuilder::new(
-    APP_HANDLE.lock().unwrap().as_ref().unwrap_or_else(|| {
-      panic!("Failed to get app handle");
-    }),
+    APP_HANDLE
+      .lock()
+      .unwrap()
+      .as_ref()
+      .unwrap_or_else(|| panic!("Failed to get app handle")),
     "hitbox",
     tauri::WebviewUrl::App(PathBuf::from("/#/hitbox")),
   )

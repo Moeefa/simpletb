@@ -1,8 +1,8 @@
-use std::sync::{LazyLock, Mutex};
+use std::thread;
 
 use icons::get_icon;
-use tauri::{Emitter, PhysicalPosition, PhysicalSize};
-use util::{exe_path, get_class, hide_taskbar, is_real_window, ScreenGeometry, USER_SETTINGS};
+use tauri::Emitter;
+use util::{exe_path, get_class, hide_taskbar, is_real_window};
 use windows::Win32::{
   Foundation::{BOOL, HWND, LPARAM},
   UI::{
@@ -14,16 +14,7 @@ use windows::Win32::{
   },
 };
 
-use crate::dock::WINDOW;
-
-#[derive(Clone, serde::Serialize)]
-pub struct Window {
-  hwnd: isize,
-  path: String,
-  buffer: Vec<u8>,
-}
-
-pub static GLOBAL_APPS: LazyLock<Mutex<Vec<Window>>> = LazyLock::new(|| Mutex::new(Vec::new()));
+use crate::dock::{position, size, Window, GLOBAL_APPS, WINDOW};
 
 pub unsafe extern "system" fn enum_windows_proc(hwnd: HWND, _: LPARAM) -> BOOL {
   let mut global_apps = GLOBAL_APPS.lock().unwrap();
@@ -57,37 +48,21 @@ pub unsafe extern "system" fn win_event_hook_callback(
   _thread_id: u32,
   _timestamp: u32,
 ) {
-  fn update_window() {
-    let binding = WINDOW.lock().unwrap();
-    let window = binding.as_ref().unwrap();
-    let global_apps = GLOBAL_APPS.lock().unwrap();
-
-    let length = global_apps.len() as i32;
-    let screen_rect = ScreenGeometry::new();
-    window
-      .set_position(PhysicalPosition {
-        x: (screen_rect.width / 2) - ((length * 44 / 2) + 8),
-        y: screen_rect.height - 51 - USER_SETTINGS.margin_bottom,
-      })
-      .unwrap();
-
-    window
-      .set_size(PhysicalSize {
-        width: (length * 44) + 8,
-        height: 51,
-      })
-      .unwrap();
-  }
-
-  fn set_apps() {
-    let global_apps = GLOBAL_APPS.lock().unwrap();
-    let binding = WINDOW.lock().unwrap();
-    let window = binding.as_ref().unwrap();
-
-    window.emit("set-apps", global_apps.to_vec()).unwrap();
-  }
-
   let mut global_apps = GLOBAL_APPS.lock().unwrap();
+
+  fn update() {
+    thread::spawn(move || {
+      let binding = WINDOW.lock().unwrap();
+      let window = binding.as_ref().unwrap();
+
+      window.set_position(position()).unwrap();
+      window.set_size(size()).unwrap();
+
+      window
+        .emit("set-apps", GLOBAL_APPS.lock().unwrap().to_vec())
+        .expect("Failed to set apps");
+    });
+  }
 
   match _event_id {
     EVENT_OBJECT_SHOW | EVENT_OBJECT_CREATE => {
@@ -110,8 +85,7 @@ pub unsafe extern "system" fn win_event_hook_callback(
           buffer: get_icon(&exe_path).expect("Failed to get icon"),
         });
 
-        update_window();
-        set_apps();
+        update();
       }
     }
     EVENT_OBJECT_DESTROY => {
@@ -121,8 +95,7 @@ pub unsafe extern "system" fn win_event_hook_callback(
       {
         global_apps.retain(|window| window.hwnd != _window_handle.0);
 
-        update_window();
-        set_apps();
+        update();
       }
     }
     EVENT_OBJECT_NAMECHANGE => {
@@ -139,8 +112,7 @@ pub unsafe extern "system" fn win_event_hook_callback(
           buffer: get_icon(&exe_path).expect("Failed to get icon"),
         });
 
-        update_window();
-        set_apps();
+        update();
       }
     }
     EVENT_OBJECT_HIDE => {
@@ -157,13 +129,12 @@ pub unsafe extern "system" fn win_event_hook_callback(
             }
           }
 
-          set_apps();
+          update();
         } else {
           if !is_real_window(_window_handle, false) {
             global_apps.retain(|window| window.hwnd != _window_handle.0);
 
-            update_window();
-            set_apps();
+            update();
           }
         }
       }

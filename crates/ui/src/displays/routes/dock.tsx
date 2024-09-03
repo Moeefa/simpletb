@@ -79,17 +79,17 @@ export function Dock() {
             key={app.hwnd}
             value={app}
             id={app.hwnd.toString()}
-            className="group backdrop-blur-lg select-none h-10 w-10 relative flex items-center justify-center aspect-square bg-white/5 rounded-md hover:bg-white/15 border border-white/[0.025]"
+            className="group backdrop-blur select-none h-10 w-10 relative flex items-center justify-center aspect-square bg-white/5 rounded-md hover:bg-white/15 border border-white/[0.025]"
             onPointerUp={() =>
               !isJustReordered.current && handleChangeWindow(app)
             }
-            onContextMenu={async (e) => {
-              e.preventDefault();
-              await invoke("open_context", {
-                x: e.clientX,
-                y: e.clientY,
-              });
-            }}
+            // onContextMenu={async (e) => {
+            //   e.preventDefault();
+            //   await invoke("open_context", {
+            //     x: e.clientX,
+            //     y: e.clientY,
+            //   });
+            // }}
           >
             {app.buffer.length === 0 ? (
               <motion.h1 className="text-lg group-data-[active=true]:animate-[bounce-up_0.55s_ease-in-out_1] group-data-[active=false]:animate-[bounce-down_0.55s_ease-in-out_1]">

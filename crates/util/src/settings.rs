@@ -3,7 +3,7 @@ use std::{fs, sync::LazyLock};
 
 use crate::home_dir;
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Clone)]
 pub struct MenubarSettings {
   pub round_corners: bool,
   pub blur: bool,
