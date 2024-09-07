@@ -1,20 +1,22 @@
+use crate::dock::*;
+
 use std::thread;
 
 use icons::get_icon;
-use tauri::Emitter;
-use util::{exe_path, get_class, hide_taskbar, is_real_window};
-use windows::Win32::{
-  Foundation::{BOOL, HWND, LPARAM},
-  UI::{
-    Accessibility::HWINEVENTHOOK,
-    WindowsAndMessaging::{
-      GetParent, EVENT_OBJECT_CREATE, EVENT_OBJECT_DESTROY, EVENT_OBJECT_HIDE,
-      EVENT_OBJECT_NAMECHANGE, EVENT_OBJECT_SHOW,
-    },
-  },
-};
+use util::*;
 
-use crate::dock::{position, size, Window, GLOBAL_APPS, WINDOW};
+use tauri::Emitter;
+
+use windows::Win32::Foundation::BOOL;
+use windows::Win32::Foundation::HWND;
+use windows::Win32::Foundation::LPARAM;
+use windows::Win32::UI::Accessibility::HWINEVENTHOOK;
+use windows::Win32::UI::WindowsAndMessaging::GetParent;
+use windows::Win32::UI::WindowsAndMessaging::EVENT_OBJECT_CREATE;
+use windows::Win32::UI::WindowsAndMessaging::EVENT_OBJECT_DESTROY;
+use windows::Win32::UI::WindowsAndMessaging::EVENT_OBJECT_HIDE;
+use windows::Win32::UI::WindowsAndMessaging::EVENT_OBJECT_NAMECHANGE;
+use windows::Win32::UI::WindowsAndMessaging::EVENT_OBJECT_SHOW;
 
 pub unsafe extern "system" fn enum_windows_proc(hwnd: HWND, _: LPARAM) -> BOOL {
   let mut global_apps = GLOBAL_APPS.lock().unwrap();

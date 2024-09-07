@@ -50,7 +50,7 @@ pub fn is_cursor_visible() -> bool {
       ..Default::default()
     };
 
-    GetCursorInfo(&mut cursor_info as *mut CURSORINFO).unwrap();
+    GetCursorInfo(&mut cursor_info as *mut CURSORINFO).expect("Failed to get CursorInfo");
     cursor_info.flags == CURSOR_SHOWING
   }
 }

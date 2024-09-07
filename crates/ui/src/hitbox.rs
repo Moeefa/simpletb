@@ -16,12 +16,12 @@ pub fn init() {
   let screen_rect = ScreenGeometry::new();
 
   unsafe {
+    // Move to the bottom of the screen with a height of 2 pixels
     MoveWindow(hwnd, 0, screen_rect.height - 2, screen_rect.width, 2, true)
       .expect("Failed to move window");
   }
 
-  let cloned_window = window.clone();
-  cloned_window.listen("mouse-in", move |_msg| {
+  window.clone().listen("mouse-in", move |_| {
     window
       .app_handle()
       .emit("hide-taskbar", ())

@@ -1,10 +1,12 @@
-use std::{env, path::PathBuf, ptr::null_mut, thread};
+use std::{path::PathBuf, ptr::null_mut, thread};
 
-use tauri::{
-  window::{Effect, EffectsBuilder},
-  Manager,
-};
-use util::{ScreenGeometry, USER_SETTINGS};
+use tauri::window::Effect;
+use tauri::window::EffectsBuilder;
+use tauri::Manager;
+
+use util::home_dir;
+use util::ScreenGeometry;
+use util::USER_SETTINGS;
 
 use windows::core::PCSTR;
 use windows::core::PSTR;
@@ -107,7 +109,8 @@ pub async fn open_context(app: tauri::AppHandle, _x: i32, _y: i32) {
 pub fn execute(commandline: String, mut applicationname: String) {
   unsafe {
     if applicationname.contains("%USERPROFILE%") {
-      let user_profile = env::var("HOME").unwrap_or_default();
+      let user_profile = home_dir().unwrap_or_default();
+      let user_profile = user_profile.to_str().unwrap_or_default();
       applicationname = applicationname.replace("%USERPROFILE%", &user_profile);
       if !PathBuf::from(&applicationname).exists() {
         println!("File does not exist: {}", applicationname);

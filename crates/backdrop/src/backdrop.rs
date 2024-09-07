@@ -23,6 +23,45 @@ use crate::hex_converter::hex_to_rgba_int;
 type SetWindowCompositionAttributeFn =
   unsafe extern "system" fn(HWND, *mut WINDOWCOMPOSITIONATTRIBDATA) -> BOOL;
 
+pub fn enable_blur_alt<S: Into<String>>(hwnd: HWND, hex: S) {
+  // Always active backdrop
+
+  // Accent policy
+  let accent = ACCENT_POLICY {
+    nAccentState: ACCENT_ENABLE_ACRYLICBLURBEHIND,
+    nFlags: 2,
+    nGradientColor: hex_to_rgba_int(hex.into()).unwrap() as i32,
+    nAnimationId: 0,
+  };
+
+  // Window composition attribute data
+  let mut data = WINDOWCOMPOSITIONATTRIBDATA {
+    Attrib: WCA_ACCENT_POLICY,
+    pvData: &accent as *const _ as *mut _,
+    cbData: mem::size_of::<ACCENT_POLICY>(),
+  };
+
+  unsafe {
+    // Load user32.dll
+    let hmodule =
+      LoadLibraryA(PCSTR("user32.dll\0".as_ptr() as *const u8)).expect("Failed to load user32.dll");
+
+    // Get SetWindowCompositionAttribute address
+    #[allow(non_snake_case)]
+    let SetWindowCompositionAttribute: SetWindowCompositionAttributeFn = std::mem::transmute(
+      GetProcAddress(
+        hmodule,
+        PCSTR("SetWindowCompositionAttribute\0".as_ptr() as *const u8),
+      )
+      .expect("Failed to get SetWindowCompositionAttribute address"),
+    );
+
+    // Set window composition attribute
+    SetWindowCompositionAttribute(hwnd, &mut data)
+      .expect("Failed to set window composition attribute");
+  }
+}
+
 // Auto: DWMSBT_AUTO
 // None: DWMSBT_NONE
 // Default: DWMSBT_MAINWINDOW
@@ -30,55 +69,15 @@ type SetWindowCompositionAttributeFn =
 // Acrylic: DWMSBT_TRANSIENTWINDOW
 //
 // https://learn.microsoft.com/en-us/windows/win32/api/dwmapi/ne-dwmapi-dwm_systembackdrop_type
-
-pub fn enable_blur<S: Into<String>>(hwnd: HWND, hex: S, always_active: bool) {
-  if !always_active {
-    // Set system backdrop
-    unsafe {
-      DwmSetWindowAttribute(
-        hwnd,
-        DWMWA_SYSTEMBACKDROP_TYPE,
-        &DWMSBT_MAINWINDOW as *const _ as _,
-        std::mem::size_of::<DWMWINDOWATTRIBUTE>() as _,
-      )
-      .expect("Failed to set window attribute")
-    };
-  } else {
-    // Always active backdrop
-
-    // Accent policy
-    let accent = ACCENT_POLICY {
-      nAccentState: ACCENT_ENABLE_ACRYLICBLURBEHIND,
-      nFlags: 2,
-      nGradientColor: hex_to_rgba_int(hex.into()).unwrap() as i32,
-      nAnimationId: 0,
-    };
-
-    // Window composition attribute data
-    let mut data = WINDOWCOMPOSITIONATTRIBDATA {
-      Attrib: WCA_ACCENT_POLICY,
-      pvData: &accent as *const _ as *mut _,
-      cbData: mem::size_of::<ACCENT_POLICY>(),
-    };
-
-    unsafe {
-      // Load user32.dll
-      let hmodule = LoadLibraryA(PCSTR("user32.dll\0".as_ptr() as *const u8))
-        .expect("Failed to load user32.dll");
-
-      // Get SetWindowCompositionAttribute address
-      #[allow(non_snake_case)]
-      let SetWindowCompositionAttribute: SetWindowCompositionAttributeFn = std::mem::transmute(
-        GetProcAddress(
-          hmodule,
-          PCSTR("SetWindowCompositionAttribute\0".as_ptr() as *const u8),
-        )
-        .expect("Failed to get SetWindowCompositionAttribute address"),
-      );
-
-      // Set window composition attribute
-      SetWindowCompositionAttribute(hwnd, &mut data)
-        .expect("Failed to set window composition attribute");
-    }
-  }
+pub fn enable_blur(hwnd: HWND) {
+  // Set system backdrop
+  unsafe {
+    DwmSetWindowAttribute(
+      hwnd,
+      DWMWA_SYSTEMBACKDROP_TYPE,
+      &DWMSBT_MAINWINDOW as *const _ as _,
+      std::mem::size_of::<DWMWINDOWATTRIBUTE>() as _,
+    )
+    .expect("Failed to set window attribute")
+  };
 }

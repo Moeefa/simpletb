@@ -1,11 +1,13 @@
 import { Window } from "@tauri-apps/api/window";
 import { useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import ExecuteButton from "../../components/ui/execute-button";
 import ActiveWindow from "../../components/widgets/active-window";
 import Clock from "../../components/widgets/clock";
 
 export function Menubar() {
-  const params = new URLSearchParams(window.location.search);
+  const location = useLocation();
+  const params = new URLSearchParams(location.search);
 
   async function fetchSize() {
     const window = Window.getCurrent();

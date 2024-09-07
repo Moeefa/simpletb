@@ -3,14 +3,14 @@ use std::{fs, sync::LazyLock};
 
 use crate::home_dir;
 
-#[derive(Deserialize, Clone)]
+#[derive(Deserialize, Clone, Debug)]
 pub struct MenubarSettings {
   pub round_corners: bool,
   pub blur: bool,
   pub color: String,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Debug)]
 pub struct Settings {
   pub height: i32,
   pub margin_bottom: i32,
@@ -52,6 +52,7 @@ impl Settings {
     ))?;
 
     let config: Settings = serde_json::from_reader(file)?;
+
     Ok(config)
   }
 }

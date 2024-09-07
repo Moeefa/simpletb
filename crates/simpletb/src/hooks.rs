@@ -9,7 +9,6 @@ use regex::Regex;
 use tauri::Emitter;
 
 use icons::get_icon;
-use util::is_cursor_visible;
 use util::ScreenGeometry;
 use util::APP_HANDLE;
 
@@ -17,6 +16,7 @@ use windows::Win32::Foundation::HWND;
 use windows::Win32::UI::Accessibility::SetWinEventHook;
 use windows::Win32::UI::Accessibility::HWINEVENTHOOK;
 use windows::Win32::UI::WindowsAndMessaging::EVENT_OBJECT_FOCUS;
+use windows::Win32::UI::WindowsAndMessaging::EVENT_OBJECT_HIDE;
 use windows::Win32::UI::WindowsAndMessaging::EVENT_SYSTEM_FOREGROUND;
 use windows::Win32::UI::WindowsAndMessaging::WINEVENT_OUTOFCONTEXT;
 use windows::Win32::UI::WindowsAndMessaging::WINEVENT_SKIPOWNPROCESS;
@@ -34,30 +34,27 @@ struct Payload {
 
 // Function to setup event listeners
 pub fn init() {
-  // Hook window focus event
-  let _ = unsafe {
+  // Hook windows events
+  unsafe {
     SetWinEventHook(
-      EVENT_SYSTEM_FOREGROUND,
-      EVENT_SYSTEM_FOREGROUND,
+      EVENT_OBJECT_FOCUS,
+      EVENT_OBJECT_FOCUS,
       None,
       Some(win_event_hook_callback),
       0,
       0,
       WINEVENT_OUTOFCONTEXT | WINEVENT_SKIPOWNPROCESS,
-    )
-  };
+    );
 
-  // Hook window focus change event
-  let _ = unsafe {
     SetWinEventHook(
-      EVENT_OBJECT_FOCUS,
-      EVENT_OBJECT_FOCUS,
+      EVENT_SYSTEM_FOREGROUND,
+      EVENT_SYSTEM_FOREGROUND,
       None,
       Some(win_event_hook_callback),
       0,
       0,
       WINEVENT_OUTOFCONTEXT | WINEVENT_SKIPOWNPROCESS,
-    )
+    );
   };
 }
 
@@ -76,7 +73,7 @@ unsafe extern "system" fn win_event_hook_callback(
     .unwrap_or_else(|| panic!("Failed to get app handle"));
 
   match _event_id {
-    EVENT_OBJECT_FOCUS | EVENT_SYSTEM_FOREGROUND => match get_active_window() {
+    EVENT_OBJECT_FOCUS | EVENT_OBJECT_HIDE | EVENT_SYSTEM_FOREGROUND => match get_active_window() {
       Ok(active_window) => {
         let active_window_hwnd = Regex::new(r"[^0-9.]")
           .unwrap()
@@ -89,10 +86,8 @@ unsafe extern "system" fn win_event_hook_callback(
         let screen = ScreenGeometry::new();
         if width == screen.width as f64
           && height == screen.height as f64
-          && !is_cursor_visible()
           && !*IS_FULLSCREEN.lock().unwrap()
         {
-          println!("{} {:?}", active_window.app_name, is_cursor_visible());
           app_handle.emit("app-fullscreen", ()).unwrap_or_else(|_| ());
         } else {
           if active_window.app_name != "Windows Explorer" {
@@ -123,8 +118,7 @@ unsafe extern "system" fn win_event_hook_callback(
       Err(_err) => {
         *PREV_WINDOW.lock().unwrap() = ActiveWindow::default();
         app_handle
-          .emit_to(
-            "menubar",
+          .emit(
             "active-window",
             Payload {
               message: "Windows Explorer".to_owned(),

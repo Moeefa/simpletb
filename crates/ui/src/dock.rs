@@ -1,9 +1,9 @@
 use tauri::Emitter;
 use tauri::Listener;
-
-use tauri::Manager;
 use tauri::PhysicalPosition;
 use tauri::PhysicalSize;
+use tauri::WebviewWindow;
+
 use windows::Win32::Foundation::HWND;
 use windows::Win32::Foundation::LPARAM;
 use windows::Win32::UI::Accessibility::SetWinEventHook;
@@ -16,7 +16,7 @@ use windows::Win32::UI::WindowsAndMessaging::WINEVENT_OUTOFCONTEXT;
 use windows::Win32::UI::WindowsAndMessaging::WINEVENT_SKIPOWNPROCESS;
 use windows::Win32::UI::WindowsAndMessaging::WS_EX_NOACTIVATE;
 
-use backdrop::enable_blur;
+use backdrop::enable_blur_alt;
 use util::*;
 
 use std::path::PathBuf;
@@ -33,14 +33,12 @@ pub struct Window {
   pub buffer: Vec<u8>,
 }
 
-pub static WINDOW: LazyLock<Mutex<Option<tauri::WebviewWindow>>> =
-  LazyLock::new(|| Mutex::new(None));
+pub static WINDOW: LazyLock<Mutex<Option<WebviewWindow>>> = LazyLock::new(|| Mutex::new(None));
 pub static GLOBAL_APPS: LazyLock<Mutex<Vec<Window>>> = LazyLock::new(|| Mutex::new(Vec::new()));
 
 pub fn init() {
   let window = setup_window().expect("Failed to setup dock window");
   let hwnd = HWND(window.hwnd().unwrap().0);
-  *WINDOW.lock().unwrap() = Some(window.clone());
 
   // Hooks
   unsafe { setup_hooks() };
@@ -53,7 +51,7 @@ pub fn init() {
   window.listen("mouse-in", move |_| show());
   window.once("ready", move |_| {
     thread::spawn(move || {
-      enable_blur(hwnd, "#10101000", true);
+      enable_blur_alt(hwnd, "#10101000");
       update();
       show();
     });
@@ -115,6 +113,8 @@ fn setup_window() -> Result<tauri::WebviewWindow, ()> {
   .visible(false)
   .build()
   .expect("Failed to build dock window");
+
+  *WINDOW.lock().unwrap() = Some(window.clone());
 
   Ok(window)
 }

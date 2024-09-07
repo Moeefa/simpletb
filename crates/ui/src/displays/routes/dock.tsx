@@ -21,10 +21,12 @@ export function Dock() {
 
     listen<{ message: string; buffer: number[]; hwnd: number }>(
       "active-window",
-      (event) =>
+      (event) => {
+        console.log(event.payload);
         typeof event.payload === "number"
           ? setActive(event.payload)
-          : setActive(event.payload.hwnd),
+          : setActive(event.payload.hwnd);
+      },
     );
 
     listen("hover-hitbox", () => {
@@ -69,7 +71,7 @@ export function Dock() {
       axis="x"
       values={apps}
       onReorder={onReorder}
-      className="flex grow aspect-square py-[0.2rem] gap-1 justify-center flex-nowrap items-center w-full px-1 h-[96.5%]"
+      className="flex bg-white/80 dark:bg-transparent grow aspect-square gap-1 justify-center flex-nowrap items-center w-full px-1 h-full pb-[0.125rem]"
       as="ul"
     >
       {apps.map((app) => {
@@ -79,7 +81,7 @@ export function Dock() {
             key={app.hwnd}
             value={app}
             id={app.hwnd.toString()}
-            className="group backdrop-blur select-none h-10 w-10 relative flex items-center justify-center aspect-square bg-white/5 rounded-md hover:bg-white/15 border border-white/[0.025]"
+            className="group dark:backdrop-blur select-none size-10 relative flex items-center justify-center aspect-square bg-white/60 dark:bg-white/5 rounded-md hover:bg-white/90 dark:hover:bg-white/15 border border-black/15 dark:border-white/[0.025]"
             onPointerUp={() =>
               !isJustReordered.current && handleChangeWindow(app)
             }

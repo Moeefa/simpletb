@@ -11,7 +11,7 @@ export default function Render({ ...props }: HTMLAttributes<HTMLDivElement>) {
   }>({ app: "Windows Explorer", buffer: [0] });
 
   async function listenEvent() {
-    await listen<{ message: string; buffer: number[] }>(
+    await listen<{ message: string; buffer: number[]; hwnd: number }>(
       "active-window",
       (event) => {
         console.log("Active Window event received: " + event.payload.message);

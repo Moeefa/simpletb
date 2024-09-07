@@ -1,9 +1,8 @@
 fn main() {
-  #[cfg(not(target_os = "windows"))]
-  {
-    eprintln!("This program must be ran in a Windows system");
-    std::process::exit(1);
-  }
+  assert!(
+    cfg!(windows),
+    "This program must be ran in a Windows system"
+  );
 
   tauri_build::build()
 }

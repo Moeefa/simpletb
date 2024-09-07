@@ -4,15 +4,13 @@ import { useEffect, useState } from "react";
 
 let timeout: NodeJS.Timeout;
 export function Hitbox() {
-  const [fullscreen, setFullscreen] = useState(false);
+  const [_fullscreen, setFullscreen] = useState(false);
 
-  console.log(fullscreen);
   useEffect(() => {
     listen("app-fullscreen", () => setFullscreen(true));
     listen("app-not-fullscreen", () => setFullscreen(false));
 
     listen("hover-bar", () => {
-      console.log("hover-bar");
       clearTimeout(timeout);
       emit("mouse-in");
     });

@@ -11,7 +11,7 @@ export default function Label({ ...props }: HTMLAttributes<HTMLDivElement>) {
   }>({ app: "Windows Explorer", buffer: [0] });
 
   async function listenEvent() {
-    await listen<{ message: string; buffer: number[] }>(
+    await listen<{ message: string; buffer: number[]; hwnd: number }>(
       "active-window",
       (event) => {
         if (
@@ -33,12 +33,11 @@ export default function Label({ ...props }: HTMLAttributes<HTMLDivElement>) {
   }, []);
 
   return (
-    <div className="w-[15px]" {...props}>
+    <div className="size-[1.15rem] aspect-square" {...props}>
       <img
         src={replaceIcon(activeWindow)}
         alt={activeWindow.app}
-        width="100%"
-        className="object-scale-down"
+        className="object-scale-down size-[1.15rem]"
       />
     </div>
   );

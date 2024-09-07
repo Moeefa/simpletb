@@ -3,6 +3,8 @@
 @tailwind utilities;
 
 @layer base {
+  @import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap");
+
   html,
   body,
   #root {
@@ -11,6 +13,7 @@
 
   body {
     @apply text-xs;
+    font-family: "Inter", sans-serif;
   }
 
   #root {
@@ -18,18 +21,20 @@
   }
 
   :root {
-    --background: #000000;
+    --background: rgb(245, 245, 245);
+    --foreground: rgb(0, 0, 0);
   }
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #f0f0f0;
+    --background: rgb(0, 0, 0);
+    --foreground: rgb(255, 255, 255);
   }
 }
 
 .main-container {
-  @apply flex justify-between px-4 h-full select-none text-white border-black bg-background;
+  @apply flex justify-between px-4 h-full select-none text-white border-black bg-background text-foreground;
 }
 
 .inverted-border-radius {
